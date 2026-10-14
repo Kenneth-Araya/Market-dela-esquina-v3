@@ -1,14 +1,19 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PublicLayout from './components/PublicLayout'
 import AdminLayout from './components/AdminLayout'
-import Home from './pages/Home'
-import Productos from './pages/Productos'
-import Nosotros from './pages/Nosotros'
-import Blogs from './pages/Blogs'
-import Contacto from './pages/Contacto'
-import Carrito from './pages/Carrito'
+
+// IMPORTAMOS LAS PAGINAS DESDE LA NUEVA CARPETA CLIENT/
+// CORRESPONDERIA AL PANEL DEL CLIENTE 
+import Home from './pages/client/Home'
+import Productos from './pages/client/Productos'
+import Nosotros from './pages/client/Nosotros'
+import Blogs from './pages/client/Blogs'
+import Contacto from './pages/client/Contacto'
+import Carrito from './pages/client/Carrito'
 import Login from './pages/Login'
-import Registro from './pages/Registro'
+import Registro from './pages/client/Registro'
+
+//CORRESPONDERIA AL PANEL DEL ADMINISTRADOR
 import Admin from './pages/admin/Admin'
 import ProductosAdmin from './pages/admin/ProductosAdmin'
 import UsuariosAdmin from './pages/admin/UsuariosAdmin'
