@@ -283,3 +283,109 @@ h1, h2, h3, .brand {
     margin: 20px 0;
 }
 
+/* ===== ESTILOS ESPECÍFICOS: NOSOTROS (DISEÑO ARMÓNICO) ===== */
+
+.nosotros-portada {
+    background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde-brand) 100%);
+    border-radius: 24px;
+    padding: 60px 20px;
+    color: var(--crema);
+    box-shadow: 0 10px 30px rgba(36, 19, 53, 0.15);
+}
+
+.nosotros-portada-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--verde-claro);
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.nosotros-titulo-principal {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    color: #ffffff;
+}
+
+/* Estadísticas: Tarjetas blancas con sombras sutiles y números naranjas */
+.nosotros-stat-card {
+    background: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 20px;
+    padding: 30px 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    transition: transform 0.3s ease;
+}
+.nosotros-stat-card:hover { transform: translateY(-5px); }
+
+.nosotros-stat-num {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--naranja);
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+/* Textos e Imagen de Nuestra Empresa */
+.nosotros-texto-destacado {
+    font-size: 1.1rem;
+    color: var(--texto-gris);
+    line-height: 1.8;
+}
+
+.nosotros-lista-elegante {
+    list-style: none;
+    padding: 0;
+    margin-top: 25px;
+}
+
+.nosotros-lista-elegante li {
+    font-size: 1.05rem;
+    color: var(--verde-brand);
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nosotros-img-fina {
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(59, 31, 92, 0.12); /* Sombra morada difuminada */
+    width: 100%;
+    max-width: 480px;
+}
+
+/* Misión y Visión: Contenedor crema unificado para que no haya cajas flotantes feas */
+.nosotros-mv-container {
+    background: var(--crema);
+    border-radius: 24px;
+    padding: 50px;
+    border: 1px solid rgba(59, 31, 92, 0.05);
+}
+
+.nosotros-mv-titulo {
+    color: var(--verde-brand);
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.nosotros-divisor {
+    width: 2px;
+    background: rgba(59, 31, 92, 0.1);
+    height: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .nosotros-divisor {
+        width: 100%;
+        height: 2px;
+        margin: 25px 0;
+    }
+}
