@@ -1,14 +1,16 @@
+import '../../styles/estilosNosotros.css';
+
 function Nosotros() {
     return (
         <>
             {/* ===== PORTADA ===== */}
             <section className="container mt-4 mb-5">
                 <div className="nosotros-portada text-center">
-                    <div className="nosotros-portada-badge">🛍️ Desde el barrio, para el barrio</div>
                     <h1 className="nosotros-titulo-principal">
                         Conoce Market De La Esquina
                     </h1>
-                    <p style={{ color: 'var(--verde-claro)', fontSize: '1.2rem', opacity: '0.9', margin: 0 }}>
+                    {/* Aquí usamos la nueva clase en lugar del style={{...}} */}
+                    <p className="nosotros-texto-portada">
                         El minimarket de siempre, ahora también online.
                     </p>
                 </div>
@@ -20,25 +22,26 @@ function Nosotros() {
                     <div className="col-6 col-md-3">
                         <div className="nosotros-stat-card h-100 d-flex flex-column justify-content-center">
                             <span className="nosotros-stat-num">+8</span>
-                            <span style={{ color: 'var(--texto-gris)', fontWeight: '500' }}>Años en el barrio</span>
+                            {/* Usamos la clase nosotros-stat-label */}
+                            <span className="nosotros-stat-label">Años en el barrio</span>
                         </div>
                     </div>
                     <div className="col-6 col-md-3">
                         <div className="nosotros-stat-card h-100 d-flex flex-column justify-content-center">
                             <span className="nosotros-stat-num">100+</span>
-                            <span style={{ color: 'var(--texto-gris)', fontWeight: '500' }}>Productos frescos</span>
+                            <span className="nosotros-stat-label">Productos frescos</span>
                         </div>
                     </div>
                     <div className="col-6 col-md-3">
                         <div className="nosotros-stat-card h-100 d-flex flex-column justify-content-center">
                             <span className="nosotros-stat-num">12.5k</span>
-                            <span style={{ color: 'var(--texto-gris)', fontWeight: '500' }}>Clientes felices</span>
+                            <span className="nosotros-stat-label">Clientes felices</span>
                         </div>
                     </div>
                     <div className="col-6 col-md-3">
                         <div className="nosotros-stat-card h-100 d-flex flex-column justify-content-center">
                             <span className="nosotros-stat-num">⭐ 4.5</span>
-                            <span style={{ color: 'var(--texto-gris)', fontWeight: '500' }}>Reseña promedio</span>
+                            <span className="nosotros-stat-label">Reseña promedio</span>
                         </div>
                     </div>
                 </div>
@@ -55,9 +58,10 @@ function Nosotros() {
                             lo que necesitas cerca de casa.
                         </p>
                         <ul className="nosotros-lista-elegante">
-                            <li><span style={{ fontSize: '1.4rem' }}>🥦</span> Verduras y frutas frescas cada día</li>
-                            <li><span style={{ fontSize: '1.4rem' }}>🚚</span> Entrega a domicilio y retiro fácil</li>
-                            <li><span style={{ fontSize: '1.4rem' }}>🤝</span> Trato cercano, de barrio</li>
+                            {/* Usamos la clase icono-lista para el tamaño de los emojis */}
+                            <li><span className="icono-lista">🥦</span> Verduras y frutas frescas cada día</li>
+                            <li><span className="icono-lista">🚚</span> Entrega a domicilio y retiro fácil</li>
+                            <li><span className="icono-lista">🤝</span> Trato cercano, de barrio</li>
                         </ul>
                     </div>
                     <div className="col-lg-6 order-1 order-lg-2 text-center">
@@ -70,7 +74,7 @@ function Nosotros() {
                 </div>
             </section>
 
-            {/* ===== MISIÓN Y VISIÓN (Unificadas en fondo crema) ===== */}
+            {/* ===== MISIÓN Y VISIÓN ===== */}
             <section className="container mb-5">
                 <div className="nosotros-mv-container">
                     <div className="row">
@@ -82,7 +86,6 @@ function Nosotros() {
                             </p>
                         </div>
 
-                        {/* Línea divisoria suave para separar misión de visión */}
                         <div className="col-md-2 d-flex justify-content-center">
                             <div className="nosotros-divisor"></div>
                         </div>
@@ -97,7 +100,6 @@ function Nosotros() {
                     </div>
                 </div>
             </section>
-
         </>
     );
 }

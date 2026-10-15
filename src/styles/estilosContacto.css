@@ -1,0 +1,63 @@
+/* ========================================= */
+/* ESTILOS EXCLUSIVOS - VISTA CONTACTO       */
+/* ========================================= */
+
+.caja-formulario {
+    background-color: #fcfbf8;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+/* Encabezado del Formulario */
+.encabezado-formulario {
+    background-color: var(--verde-oscuro, #241335);
+    color: #ffffff;
+    padding: 16px 0;
+    text-align: center;
+}
+
+.encabezado-formulario p {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Textos (Labels) */
+.cuerpo-formulario label {
+    color: var(--verde-oscuro, #241335);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    display: block;
+    text-align: left;
+}
+
+/* Cajas de entrada (Inputs y Textarea sobreescribiendo Bootstrap) */
+.cuerpo-formulario .form-control {
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al hacer clic para escribir (Focus) */
+.cuerpo-formulario .form-control:focus {
+    border-color: var(--verde-oscuro, #241335);
+    box-shadow: 0 0 0 3px rgba(36, 19, 53, 0.15); /* Anillo de enfoque morado */
+    outline: none;
+}
+
+/* Botón de Enviar (Sobreescribe el btn-outline-dark de Bootstrap) */
+.cuerpo-formulario button {
+    background-color: var(--verde-oscuro, #241335) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 30px !important;
+    padding: 15px 40px;
+    font-weight: 600;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+/* Efecto Hover del botón
