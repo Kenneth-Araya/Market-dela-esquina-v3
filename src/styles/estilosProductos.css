@@ -1,0 +1,120 @@
+/* ========================================= */
+/* ESTILOS EXCLUSIVOS - VISTA PRODUCTOS      */
+/* ========================================= */
+
+.contenedor-main-productos {
+    min-height: 65vh; 
+    display: flex;
+    flex-direction: column;
+}
+
+.titulo-seccion-productos {
+    color: #3b1f5c;
+    font-weight: 800;
+}
+
+/* Tarjeta base */
+.tarjeta-producto {
+    border: 1px solid #eaeaea;
+    border-radius: 16px;
+    background-color: #ffffff;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-producto:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(36, 19, 53, 0.1);
+}
+
+/* Contenedor de la imagen con bordes redondeados */
+.tarjeta-producto-img-caja {
+    height: 160px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.tarjeta-producto-img-caja img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Título del producto */
+.tarjeta-producto-titulo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    text-align: left;
+    margin-bottom: 12px;
+}
+
+/* Fila de peso y calificación */
+.tarjeta-meta-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+
+.tarjeta-estrella {
+    color: #ffc107;
+    margin-right: 4px;
+}
+
+/* Fila inferior: Precio y Controles */
+.tarjeta-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 36px;
+}
+
+.tarjeta-producto-precio {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--verde-oscuro, #241335);
+    margin: 0;
+}
+
+/* ===== BOTONES REDONDOS Y MORADOS (ESTILO HOME) ===== */
+.tarjeta-controles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-circulo-morado {
+    background-color: var(--verde-oscuro, #241335);
+    color: #ffffff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Círculo perfecto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-circulo-morado:hover {
+    background-color: var(--verde-brand, #743fa8);
+    transform: scale(1.08);
+}
+
+.numero-cantidad {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--verde-oscuro, #241335);
+    min-width: 18px;
+    text-align: center;
+}
