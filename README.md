@@ -34,7 +34,7 @@ public/img/     imágenes
 | Integrante | Páginas |
 |---|---|
 | Kenneth Araya | _por definir_ |
-| Bairon Valencia | _por definir_ |
+| Bairon Valencia | Encargado de la vista del usuario |
 | Jonathan Cornejo | _por definir_ |
 
 ## Flujo de trabajo con Git
