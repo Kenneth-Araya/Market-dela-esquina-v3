@@ -9,7 +9,7 @@
 }
 
 .titulo-seccion-productos {
-    color: #3b1f5c;
+    color: var(--verde-brand);
     font-weight: 800;
 }
 
@@ -77,7 +77,7 @@
 .tarjeta-producto-precio {
     font-size: 1.15rem;
     font-weight: 800;
-    color: var(--verde-oscuro, #3b1f5c);
+    color: var(--verde-oscuro, #241335);
     margin: 0;
 }
 
@@ -107,14 +107,14 @@
 }
 
 .btn-circulo-morado:hover {
-    background-color: #3b1f5c;
+    background-color: var(--verde-brand, #743fa8);
     transform: scale(1.08);
 }
 
 .numero-cantidad {
     font-weight: 700;
     font-size: 1rem;
-    color: #3b1f5c;
+    color: var(--verde-oscuro, #241335);
     min-width: 18px;
     text-align: center;
 }

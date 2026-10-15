@@ -1,13 +1,42 @@
-import { Outlet, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import { Outlet, Link } from 'react-router-dom';
 
-//NOS ASEGURAMOS DE IMPORTAR EL CSS DEL HOME
-import '../styles/estilosHome.css'
+// NOS ASEGURAMOS DE IMPORTAR EL CSS DEL HOME
+import '../styles/estilosHome.css';
 
 function PublicLayout() {
+  // 1. Estado para guardar la cantidad total de productos en el carrito
+  const [totalUnidades, setTotalUnidades] = useState(0);
+
+  // 2. Función que lee el localStorage y suma las cantidades de cada producto
+  const calcularUnidadesCarrito = () => {
+    const carritoGuardado = localStorage.getItem('carritoMarket');
+    if (!carritoGuardado) return 0;
+
+    const carrito = JSON.parse(carritoGuardado);
+    return carrito.reduce((total, item) => total + item.cantidad, 0);
+  };
+
+  // 3. Efecto que mantiene actualizado el círculo rojo en tiempo real
+  useEffect(() => {
+    // Calculamos apenas carga la página
+    setTotalUnidades(calcularUnidadesCarrito());
+
+    const actualizarBadge = () => {
+      setTotalUnidades(calcularUnidadesCarrito());
+    };
+
+    // Escuchamos el aviso cuando se agregan o quitan productos en Productos.jsx o Carrito.jsx
+    window.addEventListener('carritoActualizado', actualizarBadge);
+
+    return () => {
+      window.removeEventListener('carritoActualizado', actualizarBadge);
+    };
+  }, []);
+
   return (
     <>
-    
-      {/* AQUI IMPLEMENTAREMOS LA BARRA DE NAVEGACION (NAVBAR) */}
+      {/* BARRA DE NAVEGACION (NAVBAR) */}
       <header>
         <nav className="navbar navbar-expand-lg container py-3">
           <Link className="navbar-brand brand" to="/">
@@ -28,12 +57,24 @@ function PublicLayout() {
             </ul>
 
             <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-              <Link to="/carrito" className="icon-btn position-relative text-decoration-none d-flex align-items-center justify-content-center" aria-label="Carrito">
-                <span style={{ fontSize: '1.3rem' }}>🛒</span>
-                <span id="cart-badge" className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none" style={{ fontSize: '0.75rem', border: '2px solid white' }}>
-                  0
-                </span>
+              <Link
+                to="/carrito"
+                className="icon-btn position-relative text-decoration-none d-flex align-items-center justify-content-center"
+                aria-label="Carrito"
+              >
+                <span>🛒</span>
+
+                {/* Renderizado condicional: Solo muestra el círculo rojo si hay productos (> 0) */}
+                {totalUnidades > 0 && (
+                  <span
+                    id="cart-badge"
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill badge-carrito-morado"
+                  >
+                    {totalUnidades}
+                  </span>
+                )}
               </Link>
+
               <button id="boton-login" className="btn btn-signup">Login</button>
               <button id="boton-registro" className="btn btn-signup">Registro</button>
             </div>
@@ -41,12 +82,12 @@ function PublicLayout() {
         </nav>
       </header>
 
-      {/* AQUI REACT INYECTA DINAMICAMENTE HOME, PRODUCTOS ETC. */}
-      <main style={{ minHeight: '80vh' }}>
+      {/* AQUI REACT INYECTA DINAMICAMENTE HOME, PRODUCTOS, CARRITO, ETC. */}
+      <main>
         <Outlet />
       </main>
 
-      {/* AQUI PEGAMOS NUESTRO FOOTER QUE APARECERA EN TODAS LAS PAGINAS */}
+      {/* FOOTER GLOBAL */}
       <footer className="footer-brand text-light pt-4 pb-3 mt-5">
         <div className="container">
           <div className="row justify-content-center text-center">

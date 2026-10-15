@@ -389,3 +389,33 @@ h1, h2, h3, .brand {
         margin: 25px 0;
     }
 }
+
+/* Botón redondo del carrito en el Navbar */
+.btn-icono-carrito {
+    position: relative;
+    background-color: #ff9800; /* Fondo naranjo como en tu entrega 1 */
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.3rem;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-icono-carrito:hover {
+    background-color: #e68900;
+    transform: scale(1.05);
+}
+
+/* ========================================= */
+/* ESTILO DEL BADGE / CONTADOR DEL CARRITO   */
+/* ========================================= */
+.badge-carrito-morado {
+    background-color: var(--verde-brand) !important; /* Forzamos tu morado institucional */
+    color: #ffffff !important;           /* Texto blanco */
+    font-size: 0.75rem;
+    border: 2px solid #ffffff;          /* Borde blanco para separarlo del botón */
+}

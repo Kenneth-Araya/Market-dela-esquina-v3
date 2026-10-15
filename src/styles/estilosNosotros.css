@@ -44,7 +44,7 @@
 .nosotros-stat-num {
     font-size: 2.8rem;
     font-weight: 800;
-    color: var(--naranja);
+    color: #241335;
     line-height: 1;
     margin-bottom: 8px;
 }
@@ -64,7 +64,7 @@
 
 .nosotros-lista-elegante li {
     font-size: 1.05rem;
-    color: var(--verde-brand);
+    color: #241335;
     margin-bottom: 15px;
     font-weight: 600;
     display: flex;
@@ -124,4 +124,13 @@
 
 .icono-lista {
     font-size: 1.4rem;
+}
+
+.logo-contacto {
+    max-width: 420px; /* Aumenta este valor si lo quieres aún más grande (ej: 250px) */
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto 1.5rem auto;
+    object-fit: contain;
 }

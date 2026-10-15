@@ -1,16 +1,17 @@
 import '../../styles/estilosContacto.css';
 
+import logoMarket from '../../img/logoMarketNuevo.jpg';
+
 function Contacto() {
     return (
         <main className="container my-5">
 
             {/* ===== LOGO Y TÍTULO ===== */}
             <div className="text-center mb-5">
-                <img
-                    src="/img/logoMarket.jpg"
-                    alt="Logo Market de la Esquina"
-                    id="logo-contacto"
-                />
+                <img 
+                src={logoMarket} 
+                alt='Logo Minimarket de la Esquina'
+                className="logo-contacto" />
                 <h2>Minimarket de la Esquina</h2>
             </div>
 

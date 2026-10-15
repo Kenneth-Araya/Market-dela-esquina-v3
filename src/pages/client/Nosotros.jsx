@@ -1,5 +1,6 @@
 import '../../styles/estilosNosotros.css';
 
+import logoInicio from '../../img/logoInicio.png'
 function Nosotros() {
     return (
         <>
@@ -66,9 +67,9 @@ function Nosotros() {
                     </div>
                     <div className="col-lg-6 order-1 order-lg-2 text-center">
                         <img
-                            src="/img/canastaVerduras.jpg"
-                            alt="Productos frescos"
-                            className="nosotros-img-fina"
+                            src={logoInicio}
+                            alt="logo minimarket"
+                            className="logo-nosotros-grande img-fluid"
                         />
                     </div>
                 </div>
