@@ -93,7 +93,7 @@ function PublicLayout() {
           <div className="row justify-content-center text-center">
             <div className="col-md-4 mb-3">
               <h5>Market De La Esquina</h5>
-              <p className="mb-1">📍 Av. Siempre Viva 742, Santiago</p>
+              <p className="mb-1">📍 Av. Siempre Viva 742, Quilpue</p>
               <p className="mb-1">📞 +56 9 1234 5678</p>
               <p className="mb-0">✉️ contacto@marketdelaesquina.cl</p>
             </div>
