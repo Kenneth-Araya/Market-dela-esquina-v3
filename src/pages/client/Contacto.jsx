@@ -20,32 +20,40 @@ function Contacto() {
         setError('');
         setExito(false);
 
-        // Validación 1: Que no existan campos vacíos (trim elimina espacios en blanco)
-        if (!nombre.trim() || !correo.trim() || !contenido.trim()) {
+        const nombreLimpio = nombre.trim();
+        const correoLimpio = correo.trim().toLowerCase();
+        const contenidoLimpio = contenido.trim();
+
+        // Validación 1: Que no existan campos vacíos
+        if (!nombreLimpio || !correoLimpio || !contenidoLimpio) {
             setError('Por favor, completa todos los campos antes de enviar.');
             return;
         }
 
-        // Validación 2: Formato de correo válido
-        const regexCorreo = ["gmail.com", "duocuc.cl", "profesor.duoc.cl"];
-        if (!regexCorreo.test(correo)) {
-            setError('Por favor, ingresa un correo electrónico válido.');
+        // Validación 2: Verificar que termine en uno de los dominios permitidos (sin romper el código)
+        const dominiosPermitidos = ['@gmail.com', '@duocuc.cl', '@duoc.cl', '@profesor.duoc.cl'];
+        const esCorreoValido = dominiosPermitidos.some((dominio) =>
+            correoLimpio.endsWith(dominio) && correoLimpio.indexOf('@') > 0
+        );
+
+        if (!esCorreoValido) {
+            setError('Ingresa un correo válido (@gmail.com, @duocuc.cl o @profesor.duoc.cl).');
             return;
         }
 
         // Validación 3: Longitud mínima del mensaje
-        if (contenido.trim().length < 10) {
-            setError('El mensaje es muy corto. debe tener mas de 10 caracteres.');
+        if (contenidoLimpio.length < 10) {
+            setError('El mensaje es muy corto. Debe tener al menos 10 caracteres.');
             return;
         }
 
-        // Guardamos el mensaje en localStorage (útil para demostrar persistencia en la defensa)
+        // Guardamos el mensaje en localStorage
         const mensajesGuardados = JSON.parse(localStorage.getItem('mensajesContacto') || '[]');
         const nuevoMensaje = {
             id: Date.now(),
-            nombre: nombre.trim(),
-            correo: correo.trim(),
-            contenido: contenido.trim(),
+            nombre: nombreLimpio,
+            correo: correoLimpio,
+            contenido: contenidoLimpio,
             fecha: new Date().toLocaleDateString('es-CL')
         };
         localStorage.setItem('mensajesContacto', JSON.stringify([...mensajesGuardados, nuevoMensaje]));
@@ -56,7 +64,7 @@ function Contacto() {
         setCorreo('');
         setContenido('');
 
-        // Ocultamos el mensaje de éxito automáticamente después de 4 segundos
+        // Ocultamos el mensaje de éxito automáticamente después de 8 segundos
         setTimeout(() => {
             setExito(false);
         }, 8000);
@@ -96,7 +104,10 @@ function Contacto() {
                                         id="nombre"
                                         placeholder="Bairon Valencia"
                                         value={nombre}
-                                        onChange={(e) => setNombre(e.target.value)}
+                                        onChange={(e) => {
+                                            setNombre(e.target.value);
+                                            if (error) setError('');
+                                        }}
                                     />
                                 </div>
 
@@ -107,9 +118,12 @@ function Contacto() {
                                         type="email"
                                         className="form-control"
                                         id="correo"
-                                        placeholder="bairon@duoc.cl"
+                                        placeholder="bairon@duocuc.cl"
                                         value={correo}
-                                        onChange={(e) => setCorreo(e.target.value)}
+                                        onChange={(e) => {
+                                            setCorreo(e.target.value);
+                                            if (error) setError('');
+                                        }}
                                     />
                                 </div>
 
@@ -122,11 +136,14 @@ function Contacto() {
                                         rows="6"
                                         placeholder="Escribe todos los detalles aquí..."
                                         value={contenido}
-                                        onChange={(e) => setContenido(e.target.value)}
+                                        onChange={(e) => {
+                                            setContenido(e.target.value);
+                                            if (error) setError('');
+                                        }}
                                     ></textarea>
                                 </div>
 
-                                <div >
+                                <div>
                                     {/* Alerta condicional de Error */}
                                     {error && (
                                         <div className="alert alert-danger text-center py-2 mb-3" role="alert">
@@ -137,7 +154,7 @@ function Contacto() {
                                     {/* Alerta condicional de Éxito */}
                                     {exito && (
                                         <div className="alert alert-success text-center py-2 mb-3" role="alert">
-                                            ¡Mensaje enviado con éxito! Te responderemos a la brevedad.
+                                            ¡Mensaje enviado con éxito! Te responderemos en un plazo de 72 horas habiles.
                                         </div>
                                     )}
                                 </div>
