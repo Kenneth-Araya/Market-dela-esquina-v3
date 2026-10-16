@@ -1,80 +1,148 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { DOMINIOS_PERMITIDOS } from '../../utils/storage'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import '../../styles/estilosLogin.css';
 
 function Login() {
-  const navigate = useNavigate()
-  const [correo, setCorreo] = useState('')
-  const [contrasena, setContrasena] = useState('')
-  const [mensaje, setMensaje] = useState('')
+  const [correo, setCorreo] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [error, setError] = useState('');
+  const [exito, setExito] = useState(false);
 
-  const enviar = (e) => {
-    e.preventDefault()
-    const correoLimpio = correo.trim()
-    const claveLimpia = contrasena.trim()
+  const navigate = useNavigate();
 
-    // 1. Campos obligatorios
-    if (!correoLimpio || !claveLimpia) return setMensaje('Por favor completa ambos campos.')
+  const manejarSubmit = (e) => {
+    e.preventDefault();
 
-    // 2. Longitud de la contraseña
-    if (claveLimpia.length < 4 || claveLimpia.length > 10) {
-      return setMensaje('La contraseña debe tener entre 4 y 10 caracteres.')
+    // Limpiamos mensajes previos
+    setError('');
+    setExito(false);
+
+    const correoLimpio = correo.trim().toLowerCase();
+    const contrasenaLimpia = contrasena.trim();
+
+    // 1. VERIFICAMOS QUE LOS CAMPOS DEL LOGIN NO ESTÉN VACÍOS
+    if (!correoLimpio || !contrasenaLimpia) {
+      setError('Por favor completa ambos campos.');
+      return;
     }
 
-    // 3. Dominio permitido
-    if (!DOMINIOS_PERMITIDOS.some((d) => correoLimpio.endsWith(d))) {
-      return setMensaje('El correo debe terminar en @duoc.cl, @profesor.duoc.cl o @gmail.com.')
+    // 2. MÁXIMO 100 CARACTERES EN EL CORREO
+    if (correoLimpio.length > 100) {
+      setError('El correo no puede superar los 100 caracteres.');
+      return;
     }
 
-    // 4. Maximo 100 caracteres
-    if (correoLimpio.length > 100) return setMensaje('El correo no puede superar los 100 caracteres.')
+    // 3. VALIDAMOS QUE EL DOMINIO DEL CORREO SEA UNO DE LOS ELEGIDOS (y tenga nombre antes del @)
+    const dominiosPermitidos = ['@duoc.cl', '@duocuc.cl', '@profesor.duoc.cl', '@gmail.com'];
+    const esDominioValido = dominiosPermitidos.some((dominio) => {
+      return correoLimpio.endsWith(dominio) && correoLimpio.indexOf('@') > 0;
+    });
 
-    // Si todo esta bien, vamos al home
-    setMensaje('')
-    navigate('/home')
-  }
+    if (!esDominioValido) {
+      setError('El correo debe terminar en @duoc.cl, @profesor.duoc.cl o @gmail.com.');
+      return;
+    }
+
+    // 4. VALIDAMOS LA LONGITUD DE LA CONTRASEÑA (entre 4 y 10 caracteres)
+    if (contrasenaLimpia.length < 4 || contrasenaLimpia.length > 10) {
+      setError('La contraseña debe tener entre 4 y 10 caracteres.');
+      return;
+    }
+
+    // 5. GUARDAMOS LA SESIÓN EN LOCALSTORAGE Y AVISAMOS AL NAVBAR
+    const datosUsuario = {
+      correo: correoLimpio,
+      inicial: correoLimpio.charAt(0).toUpperCase(),
+      avatar: 'https://i.pravatar.cc/100?img=68' // Imagen de perfil circular
+    };
+
+    localStorage.setItem('usuarioActivo', JSON.stringify(datosUsuario));
+    window.dispatchEvent(new Event('sesionActualizada'));
+
+    setExito(true);
+
+    // Redirigimos al Home luego de un breve instante
+    setTimeout(() => {
+      navigate('/');
+    }, 800);
+  };
 
   return (
-    <div className="pagina-login">
-      <Link to="/admin" className="admin-link">Admin</Link>
-      <main>
-        <section id="seccion-login" className="py-5">
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-12 col-md-8 col-lg-6">
-                <form id="formulario-login" className="border rounded p-4 shadow bg-white" onSubmit={enviar}>
-                  <div className="mb-3">
-                    <h2 className="text-center mb-4">Login</h2>
-                    <label htmlFor="correo" className="form-label">Correo electrónico</label>
-                    <input type="email" id="correo" className="form-control" placeholder="nombre@correo.cl"
-                      value={correo} onChange={(e) => setCorreo(e.target.value)} />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="contrasena" className="form-label">Contraseña</label>
-                    <input type="password" id="contrasena" className="form-control" placeholder="Ingrese contraseña"
-                      value={contrasena} onChange={(e) => setContrasena(e.target.value)} />
-                  </div>
+    <main className="contenedor-login py-5">
+      {/* Botón Admin en la esquina superior derecha */}
+      <Link to="/admin" className="admin-link">
+        Admin
+      </Link>
 
-                  <div className="mt-3" role="alert">
-                    {mensaje && <div className="alert alert-danger mb-0">{mensaje}</div>}
-                  </div>
+      <section id="seccion-login" className="w-100">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-12 col-md-8 col-lg-6">
+              <form
+                id="formulario-login"
+                className="border rounded p-4 shadow bg-white"
+                onSubmit={manejarSubmit}
+                noValidate
+              >
+                <h2 className="text-center mb-4 fw-bold">Login</h2>
 
-                  <button type="submit" className="btn btn-morado w-100 mt-5">Iniciar</button>
-                </form>
-              </div>
+                <div className="mb-3">
+                  <label htmlFor="correo" className="form-label fw-semibold">
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    id="correo"
+                    className="form-control"
+                    placeholder="nombre@duoc.cl"
+                    value={correo}
+                    onChange={(e) => {
+                      setCorreo(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label htmlFor="contrasena" className="form-label fw-semibold">
+                    Contraseña
+                  </label>
+                  <input
+                    type="password"
+                    id="contrasena"
+                    className="form-control"
+                    placeholder="Ingrese contraseña (4 a 10 caracteres)"
+                    value={contrasena}
+                    onChange={(e) => {
+                      setContrasena(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+
+                {/* Mensajes de validación dinámicos */}
+                {error && (
+                  <div id="mensaje-resultado" className="alert alert-danger mt-3 py-2 text-center" role="alert">
+                    {error}
+                  </div>
+                )}
+
+                {exito && (
+                  <div className="alert alert-success mt-3 py-2 text-center" role="alert">
+                    ¡Bienvenido! Iniciando sesión...
+                  </div>
+                )}
+
+                <button type="submit" className="btn btn-morado w-100 mt-4">
+                  Iniciar
+                </button>
+              </form>
             </div>
           </div>
-        </section>
-      </main>
-
-      <footer id="contacto" className="bg-dark text-light text-center py-3">
-        <div className="container">
-          <p className="mb-1">Venta de comestibles - Viña del Mar</p>
-          <p className="mb-0">&copy; 2026 Todos los derechos reservados.</p>
         </div>
-      </footer>
-    </div>
-  )
+      </section>
+    </main>
+  );
 }
 
-export default Login
+export default Login;

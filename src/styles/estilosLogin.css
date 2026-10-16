@@ -1,0 +1,139 @@
+/* ========================================= */
+/* ESTILOS EXCLUSIVOS - VISTA LOGIN          */
+/* ========================================= */
+
+.contenedor-login {
+    min-height: 85vh;
+    background-image: url("/img/SupermercadoFondo.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Parámetros del formulario */
+#formulario-login {
+    max-width: 500px;
+    width: 100%;
+    min-height: 320px;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+/* Enlace "Admin" en la esquina superior derecha */
+.admin-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #371e54;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 20px;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.admin-link:hover {
+    background-color: #241335;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* Botón "Iniciar" en morado institucional */
+.btn-morado {
+    background-color: #371e54 !important;
+    color: #fff !important;
+    border: none !important;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.btn-morado:hover {
+    background-color: #241335 !important;
+    color: #fff !important;
+}
+
+/* ========================================= */
+/* ESTILOS DEL CÍRCULO DE PERFIL EN NAVBAR   */
+/* ========================================= */
+
+.contenedor-perfil-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-avatar-perfil {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: #371e54;
+    color: #ffffff;
+    border: 2px solid #e5d4ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-avatar-perfil:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(55, 30, 84, 0.3);
+}
+
+.btn-avatar-perfil img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.menu-desplegable-perfil {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    background-color: #ffffff;
+    min-width: 210px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border: 1px solid #eaeaea;
+    padding: 12px;
+    z-index: 1050;
+}
+
+.correo-usuario-menu {
+    font-size: 0.85rem;
+    color: #555555;
+    word-break: break-all;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.btn-cerrar-sesion {
+    width: 100%;
+    background-color: #dc3545;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.btn-cerrar-sesion:hover {
+    background-color: #bb2d3b;
+}

@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 
 // NOS ASEGURAMOS DE IMPORTAR EL CSS DEL HOME
 import '../styles/estilosHome.css';
 
 function PublicLayout() {
+
   // 1. Estado para guardar la cantidad total de productos en el carrito
   const [totalUnidades, setTotalUnidades] = useState(0);
 
-  // 2. Función que lee el localStorage y suma las cantidades de cada producto
+  // 2. Estados para la sesión del usuario y el menú desplegable de perfil
+  const [usuario, setUsuario] = useState(() => {
+    const sesionGuardada = localStorage.getItem('usuarioActivo');
+    return sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  });
+  const [menuAbierto, setMenuAbierto] = useState(false);
+
+  // 3. Función que lee el localStorage y suma las cantidades de cada producto
   const calcularUnidadesCarrito = () => {
     const carritoGuardado = localStorage.getItem('carritoMarket');
     if (!carritoGuardado) return 0;
@@ -26,13 +34,29 @@ function PublicLayout() {
       setTotalUnidades(calcularUnidadesCarrito());
     };
 
+    const actualizarSesion = () => {
+      const sesionGuardada = localStorage.getItem('usuarioActivo');
+      setUsuario(sesionGuardada ? JSON.parse(sesionGuardada) : null);
+    };
+
     // Escuchamos el aviso cuando se agregan o quitan productos en Productos.jsx o Carrito.jsx
     window.addEventListener('carritoActualizado', actualizarBadge);
+    window.addEventListener('sesionActualizada', actualizarSesion);
 
     return () => {
       window.removeEventListener('carritoActualizado', actualizarBadge);
+      window.removeEventListener('sesionActualizada', actualizarSesion);
     };
   }, []);
+
+  // 5. Función para cerrar sesión y ocultar el menú desplegable
+  const cerrarSesion = () => {
+    localStorage.removeItem('usuarioActivo');
+    setUsuario(null);
+    setMenuAbierto(false);
+    window.dispatchEvent(new Event('sesionActualizada'));
+    navigate('/');
+  };
 
   return (
     <>
@@ -75,8 +99,43 @@ function PublicLayout() {
                 )}
               </Link>
 
-              <Link id="boton-login" to="/login" className="btn btn-signup">Login</Link>
-              <Link id="boton-registro" to="/registro" className="btn btn-signup">Registro</Link>
+              {/* Renderizado condicional de Sesión: Círculo de perfil o botones Login/Registro */}
+              {usuario ? (
+                <div className="contenedor-perfil-dropdown">
+                  <button
+                    type="button"
+                    className="btn-avatar-perfil"
+                    onClick={() => setMenuAbierto(!menuAbierto)}
+                    aria-label="Menú de usuario"
+                  >
+                    <img src={usuario.avatar} alt="Foto de perfil" />
+                  </button>
+
+                  {menuAbierto && (
+                    <div className="menu-desplegable-perfil">
+                      <div className="correo-usuario-menu fw-semibold">
+                        {usuario.correo}
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-cerrar-sesion"
+                        onClick={cerrarSesion}
+                      >
+                        Cerrar sesión
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" id="boton-login" className="btn btn-signup text-decoration-none">
+                    Login
+                  </Link>
+                  <Link to="/registro" id="boton-registro" className="btn btn-signup text-decoration-none">
+                    Registro
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </nav>
