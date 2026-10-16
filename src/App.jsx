@@ -10,7 +10,7 @@ import Nosotros from './pages/client/Nosotros'
 import Blogs from './pages/client/Blogs'
 import Contacto from './pages/client/Contacto'
 import Carrito from './pages/client/Carrito'
-import Login from './pages/Login'
+import Login from './pages/client/Login'
 import Registro from './pages/client/Registro'
 
 //CORRESPONDERIA AL PANEL DEL ADMINISTRADOR

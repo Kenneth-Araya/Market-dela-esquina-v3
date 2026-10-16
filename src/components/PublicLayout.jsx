@@ -75,8 +75,8 @@ function PublicLayout() {
                 )}
               </Link>
 
-              <button id="boton-login" className="btn btn-signup">Login</button>
-              <button id="boton-registro" className="btn btn-signup">Registro</button>
+              <Link id="boton-login" to="/login" className="btn btn-signup">Login</Link>
+              <Link id="boton-registro" to="/registro" className="btn btn-signup">Registro</Link>
             </div>
           </div>
         </nav>

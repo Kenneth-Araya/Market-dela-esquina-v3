@@ -1,7 +1,5 @@
 import '../../styles/estilosHome.css';
 
-
-
 //LA SECCION PRINCIPAL DE BIENVENIDA
 function HeroSection() {
   return (

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { DOMINIOS_PERMITIDOS } from '../utils/storage'
+import { DOMINIOS_PERMITIDOS } from '../../utils/storage'
 
 function Login() {
   const navigate = useNavigate()
