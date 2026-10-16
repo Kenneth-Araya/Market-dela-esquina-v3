@@ -1,3 +1,4 @@
+import "../../styles/estiloAdmin.css";
 import { Link } from 'react-router-dom'
 import StatCard from './StatCard'
 
