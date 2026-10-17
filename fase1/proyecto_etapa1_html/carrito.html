@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras - Market De La Esquina</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos del proyecto -->
+    <link rel="stylesheet" href="css/estilosHome.css">
+    <link rel="stylesheet" href="css/estilosCarrito.css">
+</head>
+
+<body class="bg-light">
+    <header class="bg-white border-bottom shadow-sm">
+        <nav class="navbar navbar-expand-lg container py-3">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-decoration-none" href="home.html"
+                style="color: #371e54; font-size: 1.5rem;">
+                <span>🛒</span> Market De La Esquina
+            </a>
+
+            <div class="ms-auto">
+                <a href="productos.html" class="btn btn-outline-secondary btn-sm">← Seguir Comprando</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <h2 class="section-title mb-4">Tu Carrito de Compras</h2>
+
+        <div class="row g-4">
+            <!-- Lista de productos en el carrito -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 p-3">
+                    <div id="contenedor-carrito-items">
+                        <!-- El script cargará los ítems aquí -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumen de pago -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 p-4 bg-light">
+                    <h5 class="fw-bold mb-3">Resumen de la Orden</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span id="subtotal-carrito" class="fw-bold">$0</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fs-5 fw-bold">TOTAL</span>
+                        <span id="total-carrito" class="fs-5 fw-bold text-success">$0</span>
+                    </div>
+                    <button class="btn btn-primary w-100 mb-2" onclick="finalizarCompra()">Finalizar Venta</button>
+                    <button class="btn btn-outline-danger w-100 btn-sm" onclick="limpiarCarrito()">Vaciar
+                        Carrito</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- 1. Script Global del Badge (AGREGA ESTA LÍNEA) -->
+    <script src="js/badge.js" defer></script>
+
+    <!-- 2. Script Externo del Carrito -->
+    <script src="js/appCarrito.js" defer></script>
+</body>
+
+</html>
