@@ -1,216 +1,471 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { DOMINIOS_PERMITIDOS, leer, guardar } from "../../utils/storage";
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import '../../styles/estilosLogin.css';
 
+// Diccionario de regiones y comunas original
 const regiones = {
-  'Región Metropolitana': ['Santiago', 'Maipú', 'Puente Alto', 'Las Condes'],
-  'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Quilpué'],
-}
+  "Región Metropolitana": ["Santiago", "Maipú", "Puente Alto", "Las Condes"],
+  "Valparaíso": ["Valparaíso", "Viña del Mar", "Quilpué"]
+};
 
-const inicial = {
-  run: '', nombre: '', apellidos: '', correo: '', fechaNacimiento: '',
-  tipoUsuario: '', region: '', comuna: '', direccion: '', contrasena: '', confirmarContrasena: '',
-}
-
-// ===== validacion del RUN chileno (modulo 11) =====
+// ===== Validación del RUN chileno (Módulo 11) =====
 function calcularDigitoVerificador(runSinDv) {
-  let suma = 0
-  let multiplicador = 2
-  // de derecha a izquierda, multiplicando por la secuencia 2,3,4,5,6,7
+  let suma = 0;
+  let multiplicador = 2;
+
   for (let i = runSinDv.length - 1; i >= 0; i--) {
-    suma += parseInt(runSinDv.charAt(i), 10) * multiplicador
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1
+    suma += parseInt(runSinDv.charAt(i), 10) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
   }
-  const resto = 11 - (suma % 11)
-  if (resto === 11) return '0'
-  if (resto === 10) return 'K'
-  return String(resto)
+
+  const resto = 11 - (suma % 11);
+
+  if (resto === 11) return "0";
+  if (resto === 10) return "K";
+  return resto.toString();
 }
 
 function esRunValido(run) {
-  if (run.includes('.') || run.includes('-')) return false
-  if (run.length < 7 || run.length > 9) return false
-  const cuerpo = run.slice(0, -1)
-  const dv = run.slice(-1).toUpperCase()
-  if (!/^\d+$/.test(cuerpo)) return false
-  return dv === calcularDigitoVerificador(cuerpo)
+  // 1. No debe contener puntos ni guion
+    if (run.includes(".") || run.includes("-")) return false;
+
+    // 2. Debe tener entre 7 y 9 caracteres
+    if (run.length < 7 || run.length > 9) return false;
+
+    // 3. Los primeros dígitos deben ser números y el último puede ser número o K
+    return /^\d{6,8}[0-9K]$/i.test(run);
 }
 
 function Registro() {
-  const navigate = useNavigate()
-  const [form, setForm] = useState(inicial)
-  const [mensaje, setMensaje] = useState('')
+  const [run, setRun] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [fechaNacimiento, setFechaNacimiento] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState('');
+  const [region, setRegion] = useState('');
+  const [comuna, setComuna] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [contrasena, setContrasena] = useState('');
+  const [confirmarContrasena, setConfirmarContrasena] = useState('');
 
-  const cambiar = (e) => {
-    const { id, value } = e.target
-    // al cambiar la region se reinicia la comuna
-    setForm((f) => (id === 'region' ? { ...f, region: value, comuna: '' } : { ...f, [id]: value }))
-  }
+  const [error, setError] = useState('');
+  const [exito, setExito] = useState(false);
 
-  const enviar = (e) => {
-    e.preventDefault()
+  const navigate = useNavigate();
 
-    const run = form.run.trim().toUpperCase()
-    const nombre = form.nombre.trim()
-    const apellidos = form.apellidos.trim()
-    const correo = form.correo.trim()
-    const direccion = form.direccion.trim()
-    const contrasena = form.contrasena.trim()
-    const confirmar = form.confirmarContrasena.trim()
-    const { tipoUsuario, region, comuna } = form
+  // Cuando cambia la región, reiniciamos la comuna seleccionada
+  const manejarCambioRegion = (e) => {
+    setRegion(e.target.value);
+    setComuna('');
+    if (error) setError('');
+  };
 
-    if (!run || !nombre || !apellidos || !correo || !tipoUsuario || !region || !comuna || !direccion || !contrasena || !confirmar) {
-      return setMensaje('Por favor completa todos los campos obligatorios.')
+  const manejarSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+    setExito(false);
+
+    const runLimpio = run.trim().toUpperCase();
+    const nombreLimpio = nombre.trim();
+    const apellidosLimpios = apellidos.trim();
+    const correoLimpio = correo.trim().toLowerCase();
+    const direccionLimpia = direccion.trim();
+    const contrasenaLimpia = contrasena.trim();
+    const confirmarLimpia = confirmarContrasena.trim();
+
+    // 1. Verificamos que los campos obligatorios no estén vacíos (fecha de nacimiento es opcional)
+    if (
+      !runLimpio ||
+      !nombreLimpio ||
+      !apellidosLimpios ||
+      !correoLimpio ||
+      !tipoUsuario ||
+      !region ||
+      !comuna ||
+      !direccionLimpia ||
+      !contrasenaLimpia ||
+      !confirmarLimpia
+    ) {
+      setError('Por favor completa todos los campos obligatorios.');
+      return;
     }
-    if (!esRunValido(run)) {
-      return setMensaje('El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.')
+
+    // 2. Validamos el RUN: sin puntos ni guion, entre 7 y 9 caracteres y con dígito verificador correcto
+    if (!esRunValido(runLimpio)) {
+      setError('El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.');
+      return;
     }
-    if (nombre.length > 50) return setMensaje('El nombre no puede superar los 50 caracteres.')
-    if (apellidos.length > 100) return setMensaje('Los apellidos no pueden superar los 100 caracteres.')
-    if (correo.length > 100) return setMensaje('El correo no puede superar los 100 caracteres.')
-    if (!DOMINIOS_PERMITIDOS.some((d) => correo.endsWith(d))) {
-      return setMensaje('Ingresa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.')
+
+    // 3. Validamos la longitud máxima del nombre
+    if (nombreLimpio.length > 50) {
+      setError('El nombre no puede superar los 50 caracteres.');
+      return;
     }
+
+    // 4. Validamos la longitud máxima de los apellidos
+    if (apellidosLimpios.length > 100) {
+      setError('Los apellidos no pueden superar los 100 caracteres.');
+      return;
+    }
+
+    // 5. Validamos la longitud máxima del correo
+    if (correoLimpio.length > 100) {
+      setError('El correo no puede superar los 100 caracteres.');
+      return;
+    }
+
+    // 6. Validamos que el dominio del correo sea uno de los permitidos (y tenga texto antes del @)
+    const dominiosPermitidos = ['@duoc.cl', '@duocuc.cl', '@profesor.duoc.cl', '@gmail.com'];
+    const esDominioValido = dominiosPermitidos.some((dominio) => {
+      return correoLimpio.endsWith(dominio) && correoLimpio.indexOf('@') > 0;
+    });
+
+    if (!esDominioValido) {
+      setError('Ingresa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.');
+      return;
+    }
+
+    // 7. Validamos que se haya seleccionado un tipo de usuario válido
     if (!['Administrador', 'Cliente', 'Vendedor'].includes(tipoUsuario)) {
-      return setMensaje('Selecciona un tipo de usuario válido.')
+      setError('Selecciona un tipo de usuario válido.');
+      return;
     }
+
+    // 8. Validamos que la comuna seleccionada pertenezca a la región elegida
     if (!regiones[region] || !regiones[region].includes(comuna)) {
-      return setMensaje('Selecciona una comuna válida para la región elegida.')
+      setError('Selecciona una comuna válida para la región elegida.');
+      return;
     }
-    if (direccion.length > 300) return setMensaje('La dirección no puede superar los 300 caracteres.')
-    if (contrasena.length < 4 || contrasena.length > 10) {
-      return setMensaje('La contraseña debe tener entre 4 y 10 caracteres.')
+
+    // 9. Validamos la longitud máxima de la dirección
+    if (direccionLimpia.length > 300) {
+      setError('La dirección no puede superar los 300 caracteres.');
+      return;
     }
-    if (contrasena !== confirmar) return setMensaje('Las contraseñas no coinciden.')
 
-    // Guardamos el usuario (sin contraseña) para mostrarlo en el panel de administracion
-    const usuarios = leer('usuarios', [])
-    usuarios.push({
-      run, nombre, apellidos, correo, tipo: tipoUsuario, region, comuna, direccion,
-      fechaNacimiento: form.fechaNacimiento, estado: 'Activo',
-    })
-    guardar('usuarios', usuarios)
+    // 10. Validamos la longitud de la contraseña
+    if (contrasenaLimpia.length < 4 || contrasenaLimpia.length > 10) {
+      setError('La contraseña debe tener entre 4 y 10 caracteres.');
+      return;
+    }
 
-    setMensaje('')
-    navigate('/login')
-  }
+    // 11. Validamos que ambas contraseñas coincidan
+    if (contrasenaLimpia !== confirmarLimpia) {
+      setError('Las contraseñas no coinciden.');
+      return;
+    }
+
+
+    // Guardamos el usuario registrado en localStorage para tener respaldo de sus datos
+    const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]');
+
+    // Verificamos que el correo o el RUN no estén ya registrados
+    const yaExiste = usuariosGuardados.some(
+      (u) => u.correo === correoLimpio || u.run === runLimpio
+    );
+
+    if (yaExiste) {
+      setError('Ya existe un usuario registrado con ese RUN o correo electrónico.');
+      return;
+    }
+
+    // Guardamos el nuevo usuario incluyendo su contraseña
+    usuariosGuardados.push({
+      run: runLimpio,
+      nombre: nombreLimpio,
+      apellidos: apellidosLimpios,
+      correo: correoLimpio,
+      fechaNacimiento,
+      tipoUsuario,
+      region,
+      comuna,
+      direccion: direccionLimpia,
+      contrasena: contrasenaLimpia //GUARDAMOS LA CONTRASEÑA CUANDO REGISTRAMOS
+    });
+
+    localStorage.setItem('usuariosRegistrados', JSON.stringify(usuariosGuardados));
+
+    setExito(true);
+
+    // Si todas las validaciones funcionan, redirigimos a la vista de Login ;)
+    setTimeout(() => {
+      navigate('/login');
+    }, 900);
+  };
+
+  const comunasDisponibles = region ? regiones[region] || [] : [];
 
   return (
-    <div className="pagina-login">
-      <main>
-        <section id="seccion-registro" className="py-5">
-          <div className="container">
-            <div className="row justify-content-center">
-              <div className="col-12 col-md-9 col-lg-7">
-                <form id="formulario-registro" className="border rounded p-4 shadow bg-white" onSubmit={enviar}>
-                  <h2 className="text-center mb-4">Registro</h2>
+    <main className="contenedor-login d-flex flex-column justify-content-between min-vh-100 pt-5">
+      {/* Botón Admin o Volver al Login en la esquina superior derecha */}
+      <Link to="/login" className="admin-link">
+        Ir a Login
+      </Link>
 
-                  <div className="mb-3">
-                    <label htmlFor="run" className="form-label">RUN (sin puntos ni guion)</label>
-                    <input type="text" id="run" className="form-control" maxLength={9} placeholder="19011022K"
-                      autoComplete="off" value={form.run} onChange={cambiar} />
+      <section id="seccion-registro" className="w-100 my-auto py-4">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-12 col-md-9 col-lg-7">
+              <form
+                id="formulario-registro"
+                className="border rounded p-4 shadow bg-white"
+                onSubmit={manejarSubmit}
+                noValidate
+              >
+                <h2 className="text-center mb-4 fw-bold">Registro</h2>
+
+                <div className="mb-3">
+                  <label htmlFor="run" className="form-label fw-semibold">
+                    RUN (sin puntos ni guion)
+                  </label>
+                  <input
+                    type="text"
+                    id="run"
+                    className="form-control"
+                    maxLength="9"
+                    placeholder="19011022K"
+                    autoComplete="off"
+                    value={run}
+                    onChange={(e) => {
+                      setRun(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="nombre" className="form-label fw-semibold">
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      id="nombre"
+                      className="form-control"
+                      maxLength="50"
+                      placeholder="Ingrese su nombre"
+                      autoComplete="given-name"
+                      value={nombre}
+                      onChange={(e) => {
+                        setNombre(e.target.value);
+                        if (error) setError('');
+                      }}
+                    />
                   </div>
-
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="nombre" className="form-label">Nombre</label>
-                      <input type="text" id="nombre" className="form-control" maxLength={50}
-                        placeholder="Ingrese su nombre" autoComplete="given-name"
-                        value={form.nombre} onChange={cambiar} />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="apellidos" className="form-label">Apellidos</label>
-                      <input type="text" id="apellidos" className="form-control" maxLength={100}
-                        placeholder="Ingrese sus apellidos" autoComplete="family-name"
-                        value={form.apellidos} onChange={cambiar} />
-                    </div>
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="apellidos" className="form-label fw-semibold">
+                      Apellidos
+                    </label>
+                    <input
+                      type="text"
+                      id="apellidos"
+                      className="form-control"
+                      maxLength="100"
+                      placeholder="Ingrese sus apellidos"
+                      autoComplete="family-name"
+                      value={apellidos}
+                      onChange={(e) => {
+                        setApellidos(e.target.value);
+                        if (error) setError('');
+                      }}
+                    />
                   </div>
+                </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="correo" className="form-label">Correo electrónico</label>
-                    <input type="email" id="correo" className="form-control" maxLength={100}
-                      placeholder="nombre@correo.cl" autoComplete="email"
-                      value={form.correo} onChange={cambiar} />
-                  </div>
+                <div className="mb-3">
+                  <label htmlFor="correo" className="form-label fw-semibold">
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    id="correo"
+                    className="form-control"
+                    maxLength="100"
+                    placeholder="nombre@correo.cl"
+                    autoComplete="email"
+                    value={correo}
+                    onChange={(e) => {
+                      setCorreo(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="fechaNacimiento" className="form-label">Fecha de nacimiento (opcional)</label>
-                    <input type="date" id="fechaNacimiento" className="form-control"
-                      value={form.fechaNacimiento} onChange={cambiar} />
-                  </div>
+                <div className="mb-3">
+                  <label htmlFor="fecha-nacimiento" className="form-label fw-semibold">
+                    Fecha de nacimiento (opcional)
+                  </label>
+                  <input
+                    type="date"
+                    id="fecha-nacimiento"
+                    className="form-control"
+                    value={fechaNacimiento}
+                    onChange={(e) => setFechaNacimiento(e.target.value)}
+                  />
+                </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="tipoUsuario" className="form-label">Tipo de usuario</label>
-                    <select id="tipoUsuario" className="form-select" value={form.tipoUsuario} onChange={cambiar}>
-                      <option value="" disabled>Selecciona un tipo de usuario</option>
-                      <option value="Administrador">Administrador</option>
-                      <option value="Cliente">Cliente</option>
-                      <option value="Vendedor">Vendedor</option>
+                <div className="mb-3">
+                  <label htmlFor="tipo-usuario" className="form-label fw-semibold">
+                    Tipo de usuario
+                  </label>
+                  <select
+                    id="tipo-usuario"
+                    className="form-select"
+                    value={tipoUsuario}
+                    onChange={(e) => {
+                      setTipoUsuario(e.target.value);
+                      if (error) setError('');
+                    }}
+                  >
+                    <option value="" disabled>
+                      Selecciona un tipo de usuario
+                    </option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Cliente">Cliente</option>
+                    <option value="Vendedor">Vendedor</option>
+                  </select>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="region" className="form-label fw-semibold">
+                      Región
+                    </label>
+                    <select
+                      id="region"
+                      className="form-select"
+                      value={region}
+                      onChange={manejarCambioRegion}
+                    >
+                      <option value="" disabled>
+                        Selecciona una región
+                      </option>
+                      {Object.keys(regiones).map((nombreRegion) => (
+                        <option key={nombreRegion} value={nombreRegion}>
+                          {nombreRegion}
+                        </option>
+                      ))}
                     </select>
                   </div>
-
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="region" className="form-label">Región</label>
-                      <select id="region" className="form-select" value={form.region} onChange={cambiar}>
-                        <option value="" disabled>Selecciona una región</option>
-                        {Object.keys(regiones).map((r) => (
-                          <option key={r} value={r}>{r}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="comuna" className="form-label">Comuna</label>
-                      <select id="comuna" className="form-select" value={form.comuna} onChange={cambiar}
-                        disabled={!form.region}>
-                        <option value="" disabled>
-                          {form.region ? 'Selecciona una comuna' : 'Selecciona primero una región'}
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="comuna" className="form-label fw-semibold">
+                      Comuna
+                    </label>
+                    <select
+                      id="comuna"
+                      className="form-select"
+                      value={comuna}
+                      onChange={(e) => {
+                        setComuna(e.target.value);
+                        if (error) setError('');
+                      }}
+                      disabled={!region}
+                    >
+                      <option value="" disabled>
+                        {region ? 'Selecciona una comuna' : 'Selecciona primero una región'}
+                      </option>
+                      {comunasDisponibles.map((nombreComuna) => (
+                        <option key={nombreComuna} value={nombreComuna}>
+                          {nombreComuna}
                         </option>
-                        {(regiones[form.region] || []).map((c) => (
-                          <option key={c} value={c}>{c}</option>
-                        ))}
-                      </select>
-                    </div>
+                      ))}
+                    </select>
                   </div>
+                </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="direccion" className="form-label">Dirección</label>
-                    <textarea id="direccion" className="form-control" maxLength={300} rows={2}
-                      placeholder="Calle, número, depto/casa" value={form.direccion} onChange={cambiar} />
-                  </div>
+                <div className="mb-3">
+                  <label htmlFor="direccion" className="form-label fw-semibold">
+                    Dirección
+                  </label>
+                  <textarea
+                    id="direccion"
+                    className="form-control"
+                    maxLength="300"
+                    rows="2"
+                    placeholder="Calle, número, depto/casa"
+                    value={direccion}
+                    onChange={(e) => {
+                      setDireccion(e.target.value);
+                      if (error) setError('');
+                    }}
+                  ></textarea>
+                </div>
 
-                  <div className="mb-3">
-                    <label htmlFor="contrasena" className="form-label">Contraseña</label>
-                    <input type="password" id="contrasena" className="form-control" placeholder="Ingrese contraseña"
-                      autoComplete="new-password" value={form.contrasena} onChange={cambiar} />
-                  </div>
-                  <div className="mb-3">
-                    <label htmlFor="confirmarContrasena" className="form-label">Confirmar contraseña</label>
-                    <input type="password" id="confirmarContrasena" className="form-control"
-                      placeholder="Repita su contraseña" autoComplete="new-password"
-                      value={form.confirmarContrasena} onChange={cambiar} />
-                  </div>
+                <div className="mb-3">
+                  <label htmlFor="contrasena" className="form-label fw-semibold">
+                    Contraseña
+                  </label>
+                  <input
+                    type="password"
+                    id="contrasena"
+                    className="form-control"
+                    placeholder="Ingrese contraseña"
+                    autoComplete="new-password"
+                    value={contrasena}
+                    onChange={(e) => {
+                      setContrasena(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
 
-                  <div className="mt-3" role="alert">
-                    {mensaje && <div className="alert alert-danger mb-0">{mensaje}</div>}
-                  </div>
+                <div className="mb-3">
+                  <label htmlFor="confirmar-contrasena" className="form-label fw-semibold">
+                    Confirmar contraseña
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmar-contrasena"
+                    className="form-control"
+                    placeholder="Repita su contraseña"
+                    autoComplete="new-password"
+                    value={confirmarContrasena}
+                    onChange={(e) => {
+                      setConfirmarContrasena(e.target.value);
+                      if (error) setError('');
+                    }}
+                  />
+                </div>
 
-                  <button type="submit" className="btn btn-morado w-100 mt-4">Registrarme</button>
-                </form>
-              </div>
+                {error && (
+                  <div id="mensaje-resultado" className="alert alert-danger mt-3 py-2 text-center" role="alert">
+                    {error}
+                  </div>
+                )}
+
+                {exito && (
+                  <div className="alert alert-success mt-3 py-2 text-center" role="alert">
+                    ¡Registro completado con éxito! Redirigiendo al Login...
+                  </div>
+                )}
+
+                <button type="submit" className="btn btn-morado w-100 mt-4">
+                  Registrarme
+                </button>
+              </form>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      <footer id="contacto" className="bg-dark text-light text-center py-3">
+      {/* FOOTER GLOBAL ANCLADO ABAJO */}
+      <footer className="footer-brand text-light pt-4 pb-3 w-100 mt-4">
         <div className="container">
-          <p className="mb-1">Venta de comestibles - Viña del Mar</p>
-          <p className="mb-0">&copy; 2026 Todos los derechos reservados.</p>
+          <div className="row justify-content-center text-center">
+            <div className="col-md-4 mb-3">
+              <h5>Market De La Esquina</h5>
+              <p className="mb-1">📍 Av. Siempre Viva 742, Quilpue</p>
+              <p className="mb-1">📞 +56 9 1234 5678</p>
+              <p className="mb-0">✉️ contacto@marketdelaesquina.cl</p>
+            </div>
+          </div>
+          <hr className="border-secondary" />
+          <p className="text-center mb-0">&copy; 2026 Market De La Esquina. Todos los derechos reservados.</p>
         </div>
       </footer>
-    </div>
-  )
+    </main>
+  );
 }
 
-export default Registro
+export default Registro;

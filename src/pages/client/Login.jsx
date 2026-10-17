@@ -49,11 +49,29 @@ function Login() {
       return;
     }
 
-    // 5. GUARDAMOS LA SESIÓN EN LOCALSTORAGE Y AVISAMOS AL NAVBAR
+    // 5. VERIFICAMOS QUE EL USUARIO EXISTA EN LOS REGISTRADOS Y SU CONTRASEÑA COINCIDA
+    const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]');
+    const usuarioEncontrado = usuariosGuardados.find(
+      (u) => u.correo.toLowerCase() === correoLimpio
+    );
+
+    if (!usuarioEncontrado) {
+      setError('Este correo no está registrado. Por favor regístrate primero.');
+      return;
+    }
+
+    if (usuarioEncontrado.contrasena !== contrasenaLimpia) {
+      setError('Contraseña incorrecta. Inténtalo nuevamente.');
+      return;
+    }
+
+    // 6. GUARDAMOS LA SESIÓN EN LOCALSTORAGE Y AVISAMOS AL NAVBAR
     const datosUsuario = {
-      correo: correoLimpio,
-      inicial: correoLimpio.charAt(0).toUpperCase(),
-      avatar: 'https://i.pravatar.cc/100?img=68' // Imagen de perfil circular
+      nombre: usuarioEncontrado.nombre,
+      correo: usuarioEncontrado.correo,
+      tipoUsuario: usuarioEncontrado.tipoUsuario,
+      inicial: usuarioEncontrado.correo.charAt(0).toUpperCase(),
+      avatar: 'https://i.pravatar.cc/100?img=68'
     };
 
     localStorage.setItem('usuarioActivo', JSON.stringify(datosUsuario));
@@ -66,7 +84,6 @@ function Login() {
       navigate('/');
     }, 800);
   };
-
   return (
     <main className="contenedor-login pt-5">
       {/* Botón Admin en la esquina superior derecha */}
@@ -140,7 +157,7 @@ function Login() {
             </div>
           </div>
         </div>
-        
+
         {/* FOOTER LOGIN */}
         <footer className="footer-brand text-light pt-4 pb-3">
           <div className="container">
