@@ -68,7 +68,7 @@ function Login() {
   };
 
   return (
-    <main className="contenedor-login py-5">
+    <main className="contenedor-login pt-5">
       {/* Botón Admin en la esquina superior derecha */}
       <Link to="/admin" className="admin-link">
         Admin
@@ -140,6 +140,22 @@ function Login() {
             </div>
           </div>
         </div>
+        
+        {/* FOOTER LOGIN */}
+        <footer className="footer-brand text-light pt-4 pb-3">
+          <div className="container">
+            <div className="row justify-content-center text-center">
+              <div className="col-md-4 mb-3">
+                <h5>Market De La Esquina</h5>
+                <p className="mb-1">📍 Av. Siempre Viva 742, Quilpue</p>
+                <p className="mb-1">📞 +56 9 1234 5678</p>
+                <p className="mb-0">✉️ contacto@marketdelaesquina.cl</p>
+              </div>
+            </div>
+            <hr className="border-secondary" />
+            <p className="text-center mb-0">&copy; 2026 Market De La Esquina. Todos los derechos reservados.</p>
+          </div>
+        </footer>
       </section>
     </main>
   );

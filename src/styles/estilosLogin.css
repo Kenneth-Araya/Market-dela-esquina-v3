@@ -2,16 +2,40 @@
 /* ESTILOS EXCLUSIVOS - VISTA LOGIN          */
 /* ========================================= */
 
+#seccion-login {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* El formulario conserva su centrado vertical */
+#seccion-login > .container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* El footer queda al final de la página */
+.footer-brand {
+    width: 100%;
+    margin-top: auto;
+}
 .contenedor-login {
-    min-height: 85vh;
+    min-height: 100vh;
     background-image: url("/img/SupermercadoFondo.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+
+    /* Distribución vertical de la página */
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    box-sizing: border-box;
 }
 
 /* Parámetros del formulario */
