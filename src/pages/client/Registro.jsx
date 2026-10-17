@@ -27,13 +27,31 @@ function calcularDigitoVerificador(runSinDv) {
 
 function esRunValido(run) {
   // 1. No debe contener puntos ni guion
-    if (run.includes(".") || run.includes("-")) return false;
+  if (run.includes(".") || run.includes("-")) return false;
 
-    // 2. Debe tener entre 7 y 9 caracteres
-    if (run.length < 7 || run.length > 9) return false;
+  // 2. Debe tener entre 7 y 9 caracteres
+  if (run.length < 7 || run.length > 9) return false;
 
-    // 3. Los primeros dígitos deben ser números y el último puede ser número o K
-    return /^\d{6,8}[0-9K]$/i.test(run);
+  // 3. Formato de dígitos terminado en número o K
+  if (!/^\d{6,8}[0-9K]$/i.test(run)) return false;
+
+  // 4. Algoritmo Módulo 11
+  const cuerpo = run.slice(0, -1);
+  const dvIngresado = run.slice(-1).toUpperCase();
+
+  let suma = 0;
+  let multiplicador = 2;
+
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo.charAt(i), 10) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+
+  const resto = suma % 11;
+  const dvCalculado = 11 - resto;
+  const dvEsperado = dvCalculado === 11 ? '0' : dvCalculado === 10 ? 'K' : String(dvCalculado);
+
+  return dvIngresado === dvEsperado;
 }
 
 function Registro() {
