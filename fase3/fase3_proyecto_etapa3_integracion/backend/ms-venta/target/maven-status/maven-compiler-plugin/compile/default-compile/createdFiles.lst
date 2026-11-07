@@ -1,0 +1,13 @@
+cl\duoc\msVenta\controller\VentaController.class
+cl\duoc\msVenta\config\OpenApiConfig.class
+cl\duoc\msVenta\SistemaMarketApplication.class
+cl\duoc\msVenta\exeptions\RecursoNoEncontradoException.class
+cl\duoc\msVenta\dto\VentaDTOMapper.class
+cl\duoc\msVenta\repository\VentaRepository.class
+cl\duoc\msVenta\model\Venta.class
+cl\duoc\msVenta\exeptions\ManejadorGlobalExcepciones$ErrorResponse.class
+cl\duoc\msVenta\service\VentaService.class
+cl\duoc\msVenta\Client\BoletaClient.class
+cl\duoc\msVenta\dto\BoletaVentaDTO.class
+cl\duoc\msVenta\exeptions\ManejadorGlobalExcepciones.class
+cl\duoc\msVenta\dto\VentaDTO.class
