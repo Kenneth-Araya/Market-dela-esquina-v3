@@ -1,0 +1,11 @@
+cl\duoc\ms_producto\dto\ProductoDTOMapper.class
+cl\duoc\ms_producto\model\Producto.class
+cl\duoc\ms_producto\dto\ProductoDTO.class
+cl\duoc\ms_producto\exception\ManejadorGlobalExcepciones.class
+cl\duoc\ms_producto\MsProductoApplication.class
+cl\duoc\ms_producto\config\OpenApiConfig.class
+cl\duoc\ms_producto\exception\RecursoNoEncontradoException.class
+cl\duoc\ms_producto\repository\ProductoRepository.class
+cl\duoc\ms_producto\controller\ProductoController.class
+cl\duoc\ms_producto\exception\ManejadorGlobalExcepciones$ErrorResponse.class
+cl\duoc\ms_producto\service\ProductoService.class

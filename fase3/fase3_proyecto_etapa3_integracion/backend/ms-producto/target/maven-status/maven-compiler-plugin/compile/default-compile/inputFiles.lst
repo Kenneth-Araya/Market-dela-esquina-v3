@@ -1,0 +1,10 @@
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\config\OpenApiConfig.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\controller\ProductoController.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\dto\ProductoDTO.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\dto\ProductoDTOMapper.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\exception\ManejadorGlobalExcepciones.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\exception\RecursoNoEncontradoException.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\model\Producto.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\MsProductoApplication.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\repository\ProductoRepository.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-producto\src\main\java\cl\duoc\ms_producto\service\ProductoService.java
