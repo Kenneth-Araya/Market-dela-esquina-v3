@@ -1,0 +1,10 @@
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\config\OpenApiConfig.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\controller\BoletaController.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\dto\BoletaDTO.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\dto\BoletaDTOMapper.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\exeptions\ManejadorGlobalExcepciones.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\exeptions\RecursoNoEncontradoException.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\model\Boleta.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\repository\BoletaRepository.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\service\BoletaService.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-boleta\src\main\java\cl\duoc\sistemaMarket\SistemaMarketApplication.java

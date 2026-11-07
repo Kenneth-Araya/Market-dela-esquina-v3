@@ -1,0 +1,11 @@
+cl\duoc\sistemaMarket\exeptions\ManejadorGlobalExcepciones.class
+cl\duoc\sistemaMarket\service\BoletaService.class
+cl\duoc\sistemaMarket\exeptions\ManejadorGlobalExcepciones$ErrorResponse.class
+cl\duoc\sistemaMarket\SistemaMarketApplication.class
+cl\duoc\sistemaMarket\exeptions\RecursoNoEncontradoException.class
+cl\duoc\sistemaMarket\controller\BoletaController.class
+cl\duoc\sistemaMarket\repository\BoletaRepository.class
+cl\duoc\sistemaMarket\dto\BoletaDTO.class
+cl\duoc\sistemaMarket\model\Boleta.class
+cl\duoc\sistemaMarket\dto\BoletaDTOMapper.class
+cl\duoc\sistemaMarket\config\OpenApiConfig.class
