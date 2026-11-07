@@ -1,0 +1,13 @@
+cl\duoc\ms_inventario\controller\InventarioController.class
+cl\duoc\ms_inventario\MsInventarioApplication.class
+cl\duoc\ms_inventario\dto\InventarioDTO.class
+cl\duoc\ms_inventario\exception\ManejadorGlobalExcepciones$ErrorResponse.class
+cl\duoc\ms_inventario\service\InventarioService.class
+cl\duoc\ms_inventario\dto\InventarioMapper.class
+cl\duoc\ms_inventario\repository\InventarioRepository.class
+cl\duoc\ms_inventario\dto\ProductoResponseDTO.class
+cl\duoc\ms_inventario\exception\ManejadorGlobalExcepciones.class
+cl\duoc\ms_inventario\model\Inventario.class
+cl\duoc\ms_inventario\clients\ProductoClient.class
+cl\duoc\ms_inventario\config\OpenApiConfig.class
+cl\duoc\ms_inventario\exception\RecursoNoEncontradoException.class

@@ -1,0 +1,12 @@
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\clients\ProductoClient.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\config\OpenApiConfig.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\controller\InventarioController.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\dto\InventarioDTO.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\dto\InventarioMapper.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\dto\ProductoResponseDTO.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\exception\ManejadorGlobalExcepciones.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\exception\RecursoNoEncontradoException.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\model\Inventario.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\MsInventarioApplication.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\repository\InventarioRepository.java
+D:\descargas\Proyecto Fullstack\Market-De-La-Esquina\ms-inventario\src\main\java\cl\duoc\ms_inventario\service\InventarioService.java
