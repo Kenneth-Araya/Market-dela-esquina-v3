@@ -17,7 +17,7 @@ import cl.duoc.sistemaMarket.repository.RegionRepository;
 import cl.duoc.sistemaMarket.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class DatosIniciales implements CommandLineRunner {
 
