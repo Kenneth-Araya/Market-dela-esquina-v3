@@ -92,48 +92,30 @@ function Registro() {
     const contrasenaLimpia = contrasena.trim();
     const confirmarLimpia = confirmarContrasena.trim();
 
-    // 1. Verificamos que los campos obligatorios no estén vacíos (fecha de nacimiento es opcional)
-    if (
-      !runLimpio ||
-      !nombreLimpio ||
-      !apellidosLimpios ||
-      !correoLimpio ||
-      !tipoUsuario ||
-      !region ||
-      !comuna ||
-      !direccionLimpia ||
-      !contrasenaLimpia ||
-      !confirmarLimpia
-    ) {
+    // Validaciones de FrontEnd
+    if (!runLimpio || !nombreLimpio || !apellidosLimpios || !correoLimpio || !tipoUsuario || !region || !comuna || !direccionLimpia || !contrasenaLimpia || !confirmarLimpia) {
       setError('Por favor completa todos los campos obligatorios.');
       return;
     }
 
-    // 2. Validamos el RUN: sin puntos ni guion, entre 7 y 9 caracteres y con dígito verificador correcto
-    if (!esRunValido(runLimpio)) {
-      setError('El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.');
-      return;
-    }
+    //if (!esRunValido(runLimpio)) {
+    //  setError('El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.');
+    //  return;
+    //}
 
-    // 3. Validamos la longitud máxima del nombre
     if (nombreLimpio.length > 50) {
       setError('El nombre no puede superar los 50 caracteres.');
       return;
     }
-
-    // 4. Validamos la longitud máxima de los apellidos
     if (apellidosLimpios.length > 100) {
       setError('Los apellidos no pueden superar los 100 caracteres.');
       return;
     }
-
-    // 5. Validamos la longitud máxima del correo
     if (correoLimpio.length > 100) {
       setError('El correo no puede superar los 100 caracteres.');
       return;
     }
 
-    // 6. Validamos que el dominio del correo sea uno de los permitidos (y tenga texto antes del @)
     const dominiosPermitidos = ['@duoc.cl', '@duocuc.cl', '@profesor.duoc.cl', '@gmail.com'];
     const esDominioValido = dominiosPermitidos.some((dominio) => {
       return correoLimpio.endsWith(dominio) && correoLimpio.indexOf('@') > 0;
@@ -143,73 +125,72 @@ function Registro() {
       setError('Ingresa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.');
       return;
     }
-
-    // 7. Validamos que se haya seleccionado un tipo de usuario válido
     if (!['Administrador', 'Cliente', 'Vendedor'].includes(tipoUsuario)) {
       setError('Selecciona un tipo de usuario válido.');
       return;
     }
-
-    // 8. Validamos que la comuna seleccionada pertenezca a la región elegida
     if (!regiones[region] || !regiones[region].includes(comuna)) {
       setError('Selecciona una comuna válida para la región elegida.');
       return;
     }
-
-    // 9. Validamos la longitud máxima de la dirección
     if (direccionLimpia.length > 300) {
       setError('La dirección no puede superar los 300 caracteres.');
       return;
     }
-
-    // 10. Validamos la longitud de la contraseña
     if (contrasenaLimpia.length < 4 || contrasenaLimpia.length > 10) {
       setError('La contraseña debe tener entre 4 y 10 caracteres.');
       return;
     }
-
-    // 11. Validamos que ambas contraseñas coincidan
     if (contrasenaLimpia !== confirmarLimpia) {
       setError('Las contraseñas no coinciden.');
       return;
     }
 
+    // ==========================================
+    // CONEXIÓN CON EL BACKEND (Fetch a Spring Boot)
+    // ==========================================
+    const nuevoUsuario = {
+      runUsuario: runLimpio,
+      nombreUsuario: nombreLimpio,
+      apellidosUsuario: apellidosLimpios,
+      correoUsuario: correoLimpio,
+      fechaNacimientoUsuario: fechaNacimiento ? fechaNacimiento : null,
+      tipoUsuario: tipoUsuario.toUpperCase(), // <-- AQUÍ CAMBIAMOS A MAYÚSCULAS,
+      regionUsuario: region,
+      comunaUsuario: comuna,
+      direccionUsuario: direccionLimpia,
+      contrasenaUsuario: contrasenaLimpia,
+      estadoUsuario: "ACTIVO"
+    };
 
-    // Guardamos el usuario registrado en localStorage para tener respaldo de sus datos
-    const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]');
+    const registrarEnBD = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(nuevoUsuario)
+        });
 
-    // Verificamos que el correo o el RUN no estén ya registrados
-    const yaExiste = usuariosGuardados.some(
-      (u) => u.correo === correoLimpio || u.run === runLimpio
-    );
+        if (respuesta.ok) {
+          setExito(true);
+          setTimeout(() => {
+            navigate('/login');
+          }, 1500);
+        } else {
+          // ESTO LEERÁ EL ERROR REAL DEL BACKEND
+          const errorTexto = await respuesta.text();
+          console.error("Error del backend:", errorTexto);
+          setError(`Error del servidor: ${errorTexto || respuesta.statusText}`);
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+        setError('Error al conectar con el servidor. Revisa que el backend esté corriendo.');
+      }
+    };
 
-    if (yaExiste) {
-      setError('Ya existe un usuario registrado con ese RUN o correo electrónico.');
-      return;
-    }
-
-    // Guardamos el nuevo usuario incluyendo su contraseña
-    usuariosGuardados.push({
-      run: runLimpio,
-      nombre: nombreLimpio,
-      apellidos: apellidosLimpios,
-      correo: correoLimpio,
-      fechaNacimiento,
-      tipoUsuario,
-      region,
-      comuna,
-      direccion: direccionLimpia,
-      contrasena: contrasenaLimpia //GUARDAMOS LA CONTRASEÑA CUANDO REGISTRAMOS
-    });
-
-    localStorage.setItem('usuariosRegistrados', JSON.stringify(usuariosGuardados));
-
-    setExito(true);
-
-    // Si todas las validaciones funcionan, redirigimos a la vista de Login ;)
-    setTimeout(() => {
-      navigate('/login');
-    }, 900);
+    registrarEnBD();
   };
 
   const comunasDisponibles = region ? regiones[region] || [] : [];
