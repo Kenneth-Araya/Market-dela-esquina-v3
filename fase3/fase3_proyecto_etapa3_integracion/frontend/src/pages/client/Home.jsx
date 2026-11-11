@@ -56,23 +56,39 @@ function BannersSection() {
   );
 }
 
-// CONTENEDOR DE LOS PRODUCTOS DINÁMICOS (Conservando tu diseño original y conectado al carrito)
+// CONTENEDOR DE LOS PRODUCTOS DINÁMICOS (Conectado a la BD y al carrito)
 function ProductosSection() {
-  // Mismos IDs y propiedades que en Productos.jsx para que sumen, resten y se vean igual en el Carrito
-  const productos = [
-    { id: 1, nombre: 'Pan amasado casero', descripcion: '500gm', precio: 1500, img: '/img/pan.jpg' },
-    { id: 2, nombre: 'Queso gauda laminado', descripcion: '250gm', precio: 3200, img: '/img/queso.jpg' },
-    { id: 3, nombre: 'Palta hass madura', descripcion: '1 unidad', precio: 990, img: '/img/palta.jpg' },
-    { id: 4, nombre: 'Leche entera Colun', descripcion: '1L', precio: 1190, img: '/img/leche.jpg' }
-  ];
 
-  // 1. Leemos el carrito guardado en localStorage al cargar el Home
+  // 1. Estado para almacenar los productos del backend
+  const [productos, setProductos] = useState([]);
+
+  // 2. Leemos el carrito guardado en localStorage al cargar el Home
   const [carrito, setCarrito] = useState(() => {
     const carritoGuardado = localStorage.getItem('carritoMarket');
     return carritoGuardado ? JSON.parse(carritoGuardado) : [];
   });
 
-  // 2. Guardamos en localStorage y avisamos al contador del Navbar en cada cambio
+  // 3. Efecto para llamar al Backend al entrar a la página
+  useEffect(() => {
+    const cargarProductosReales = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/productos`);
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          // Mostramos solo los primeros 4 productos en el Home para no saturar la vista
+          setProductos(datos.slice(0, 4));
+        } else {
+          console.error("Error al obtener los productos del servidor");
+        }
+      } catch (error) {
+        console.error("Error conectando con el backend:", error);
+      }
+    };
+
+    cargarProductosReales();
+  }, []);
+
+  // 4. Guardamos en localStorage y avisamos al contador del Navbar en cada cambio
   useEffect(() => {
     localStorage.setItem('carritoMarket', JSON.stringify(carrito));
     window.dispatchEvent(new Event('carritoActualizado'));
@@ -95,7 +111,15 @@ function ProductosSection() {
             : item
         );
       } else {
-        return [...prevCarrito, { ...producto, cantidad: 1 }];
+        // Adaptamos los nombres de la BD al formato del carrito
+        const productoParaCarrito = {
+          id: producto.id,
+          nombre: producto.nombreProducto,
+          precio: producto.precioProducto,
+          img: producto.imagenProducto,
+          cantidad: 1
+        };
+        return [...prevCarrito, productoParaCarrito];
       }
     });
   };
@@ -114,7 +138,7 @@ function ProductosSection() {
   return (
     <section className="container mb-5" id="productos">
       <div className="d-flex justify-content-between align-items-center flex-wrap mb-4">
-        <h2 className="section-title mb-3 mb-md-0">Todos Nuestros Productos</h2>
+        <h2 className="section-title mb-3 mb-md-0">Productos Destacados</h2>
       </div>
 
       <div className="row g-4">
@@ -124,17 +148,22 @@ function ProductosSection() {
           return (
             <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={producto.id}>
               <div className="product-card d-flex flex-column h-100">
-                <img src={producto.img} alt={producto.nombre} className="product-img" />
+                {/* Ruta de imagen corregida para que lea desde public/img/ */}
+                <img 
+                  src={`/img/${producto.imagenProducto}`} 
+                  alt={producto.nombreProducto} 
+                  className="product-img" 
+                />
 
                 <div className="mt-2 flex-grow-1">
-                  <h3 className="product-name mb-1">{producto.nombre}</h3>
-                  <p className="product-meta mb-3">{producto.descripcion}</p>
+                  <h3 className="product-name mb-1">{producto.nombreProducto}</h3>
+                  <p className="product-meta mb-3">{producto.pesoProducto}</p>
                 </div>
 
                 {/* Contenedor de precio y botones (- cantidad +) usando tu clase .btn-add */}
                 <div className="d-flex justify-content-between align-items-center mt-auto">
                   <span className="product-price">
-                    ${producto.precio.toLocaleString('es-CL')}
+                    ${producto.precioProducto.toLocaleString('es-CL')}
                   </span>
 
                   <div className="d-flex align-items-center gap-2">
