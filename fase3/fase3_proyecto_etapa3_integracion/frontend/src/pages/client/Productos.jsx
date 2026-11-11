@@ -2,47 +2,34 @@ import { useState, useEffect } from 'react';
 import '../../styles/estilosProductos.css';
 
 function Productos() {
-  // Precios numéricos para poder calcular subtotales y totales en el carrito
-  const listaProductos = [
-    {
-      id: 1,
-      nombre: 'Pan amasado casero',
-      peso: '500gm',
-      calificacion: '(4.8/5)',
-      precio: 1500,
-      img: '/img/pan.jpg'
-    },
-    {
-      id: 2,
-      nombre: 'Queso gauda laminado',
-      peso: '250gm',
-      calificacion: '(4.7/5)',
-      precio: 3200,
-      img: '/img/queso.jpg'
-    },
-    {
-      id: 3,
-      nombre: 'Palta hass madura',
-      peso: '1 unidad',
-      calificacion: '(4.8/5)',
-      precio: 990,
-      img: '/img/palta.jpg'
-    },
-    {
-      id: 4,
-      nombre: 'Leche entera Colun',
-      peso: '1L',
-      calificacion: '(4.6/5)',
-      precio: 1190,
-      img: '/img/leche.jpg'
-    }
-  ];
+  // 1. Estado para almacenar los productos que vienen del backend
+  const [productos, setProductos] = useState([]);
 
-  // 1. Leemos el carrito guardado en localStorage al cargar la vista
+  // 2. Leemos el carrito guardado en localStorage al cargar la vista
   const [carrito, setCarrito] = useState(() => {
     const carritoGuardado = localStorage.getItem('carritoMarket');
     return carritoGuardado ? JSON.parse(carritoGuardado) : [];
   });
+
+  // 3. Efecto para llamar al Backend al entrar a la página (Reemplaza la lista estática)
+  useEffect(() => {
+    const cargarProductosReales = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/productos`);
+
+        if (respuesta.ok) {
+          const datos = await respuesta.json();
+          setProductos(datos); // Guardamos los datos de la base de datos en el estado
+        } else {
+          console.error("Error al obtener los productos del servidor");
+        }
+      } catch (error) {
+        console.error("Error conectando con el backend:", error);
+      }
+    };
+
+    cargarProductosReales();
+  }, []);
 
   // Cada vez que 'carrito' cambia, guardamos en localStorage y avisamos al Navbar
   useEffect(() => {
@@ -67,7 +54,15 @@ function Productos() {
             : item
         );
       } else {
-        return [...prevCarrito, { ...producto, cantidad: 1 }];
+        // Adaptamos los nombres del backend para que el carrito siga funcionando igual
+        const productoParaCarrito = {
+          id: producto.id,
+          nombre: producto.nombreProducto,
+          precio: producto.precioProducto,
+          img: producto.imagenProducto,
+          cantidad: 1
+        };
+        return [...prevCarrito, productoParaCarrito];
       }
     });
   };
@@ -93,7 +88,8 @@ function Productos() {
       </div>
 
       <div className="row g-4">
-        {listaProductos.map((producto) => {
+        {/* Iteramos sobre el estado 'productos' que viene de la BD */}
+        {productos.map((producto) => {
           const cantidadActual = obtenerCantidad(producto.id);
 
           return (
@@ -101,22 +97,23 @@ function Productos() {
               <div className="tarjeta-producto h-100 d-flex flex-column">
 
                 <div className="tarjeta-producto-img-caja">
-                  <img src={producto.img} alt={producto.nombre} />
+                  {/* Usamos imagenProducto según el backend */}
+                  <img src={producto.imagenProducto} alt={producto.nombreProducto} />
                 </div>
 
-                <h5 className="tarjeta-producto-titulo">{producto.nombre}</h5>
+                <h5 className="tarjeta-producto-titulo">{producto.nombreProducto}</h5>
 
                 <div className="tarjeta-meta-info mt-auto">
-                  <span>{producto.peso}</span>
+                  <span>{producto.pesoProducto}</span>
                   <span>
                     <span className="tarjeta-estrella">⭐</span>
-                    {producto.calificacion}
+                    ({producto.ratingProducto}/5)
                   </span>
                 </div>
 
                 <div className="tarjeta-footer mt-2">
                   <p className="tarjeta-producto-precio">
-                    ${producto.precio.toLocaleString('es-CL')}
+                    ${producto.precioProducto.toLocaleString('es-CL')}
                   </p>
 
                   <div className="tarjeta-controles">
