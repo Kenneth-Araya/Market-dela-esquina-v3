@@ -1,0 +1,146 @@
+/* =========================================
+   ESTILOS EXCLUSIVOS DEL CARRITO
+   ========================================= */
+
+.contenedor-main-carrito {
+    min-height: 65vh;
+}
+
+.text-brand {
+    color: var(--verde-oscuro, #241335) !important; 
+}
+
+.icono-carrito-vacio {
+    font-size: 2.5rem;
+    display: block;
+}
+
+/* --- BOTONES DE RESUMEN (MORADO Y ROJO) --- */
+
+.btn-finalizar-venta {
+    background-color: var(--verde-oscuro, #241335);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-finalizar-venta:hover {
+    background-color: var(--verde-brand, #743fa8);
+    color: #ffffff;
+}
+
+.btn-finalizar-venta:active {
+    transform: scale(0.98);
+}
+
+.btn-vaciar-carrito {
+    background-color: #ffffff;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 400;
+    transition: all 0.2s ease;
+}
+
+.btn-vaciar-carrito:hover {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+/* --- TARJETAS Y CONTENEDORES --- */
+
+.bg-resumen {
+    background-color: #fbf9f4;
+    border: 1px solid #e5e7eb !important;
+}
+
+.carrito-card-shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* --- FILAS DE PRODUCTOS EN EL CARRITO --- */
+
+.item-carrito {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.item-carrito:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.img-item-carrito {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #eaeaea;
+}
+
+.precio-subtotal-item {
+    min-width: 95px;
+    text-align: right;
+}
+
+/* --- CONTROLES + Y - REDONDOS Y MORADOS (IDÉNTICOS A PRODUCTOS.JSX) --- */
+
+.carrito-controles-unidad {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-circulo-morado {
+    background-color: var(--verde-oscuro, #241335);
+    color: #ffffff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-circulo-morado:hover {
+    background-color: var(--verde-brand, #743fa8);
+    transform: scale(1.08);
+}
+
+.numero-cantidad {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--verde-oscuro, #241335);
+    min-width: 22px;
+    text-align: center;
+}
+
+.btn-eliminar-todo {
+    color: #dc3545;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.btn-eliminar-todo:hover {
+    color: #a71d2a;
+}

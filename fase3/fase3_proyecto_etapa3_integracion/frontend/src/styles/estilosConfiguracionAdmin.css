@@ -1,0 +1,108 @@
+/* =========================================
+   TÍTULO DE LA SECCIÓN
+   ========================================= */
+.section-title {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+    color: var(--verde-oscuro, #2D1B4E);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* =========================================
+   CONTENEDOR DEL FORMULARIO
+   ========================================= */
+.admin-form-card {
+    max-width: 700px;
+    padding: 32px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+/* =========================================
+   INPUTS Y TEXTAREAS (Sobrescribiendo Bootstrap)
+   ========================================= */
+.admin-form-card .form-label {
+    margin-bottom: 0.4rem;
+    color: #4a4a4a;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.admin-form-card .form-control,
+.admin-form-card .form-select {
+    padding: 10px 14px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Anillo morado al hacer click en lugar del azul de Bootstrap */
+.admin-form-card .form-control:focus,
+.admin-form-card .form-select:focus {
+    border-color: var(--verde-oscuro, #2D1B4E);
+    box-shadow: 0 0 0 3px rgba(45, 27, 78, 0.15);
+}
+
+/* =========================================
+   INTERRUPTORES (Switches)
+   ========================================= */
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+    cursor: pointer;
+}
+
+/* Switch encendido en morado */
+.form-switch .form-check-input:checked {
+    border-color: var(--verde-oscuro, #2D1B4E);
+    background-color: var(--verde-oscuro, #2D1B4E);
+}
+
+.form-check-label {
+    padding-top: 2px;
+    color: #4a4a4a;
+    cursor: pointer;
+}
+
+/* =========================================
+   BOTONES DEL FORMULARIO
+   ========================================= */
+.btn-shopnow {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    background-color: #FF9800;
+    color: #ffffff;
+    font-weight: 600;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-shopnow:hover {
+    background-color: #F57C00;
+    color: #ffffff;
+}
+
+.btn-shopnow:active {
+    transform: scale(0.98);
+}
+
+.btn-outline-secondary {
+    padding: 10px 24px;
+    border: 2px solid #eaeaea;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #4a4a4a;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-outline-secondary:hover {
+    border-color: var(--verde-oscuro, #2D1B4E);
+    background-color: #f8f5fc;
+    color: var(--verde-oscuro, #2D1B4E);
+}

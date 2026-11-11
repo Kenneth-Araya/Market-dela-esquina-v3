@@ -1,0 +1,88 @@
+/* =========================================
+   TÍTULO DE LA SECCIÓN
+   ========================================= */
+.section-title {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+    color: var(--verde-oscuro, #2D1B4E); /* Si no toma la variable, usa el morado */
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* =========================================
+   TARJETAS GENÉRICAS (Accesos y Actividad)
+   ========================================= */
+.admin-card {
+    padding: 32px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.admin-card h5 {
+    color: var(--verde-oscuro, #2D1B4E);
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+/* =========================================
+   LISTA DE ACTIVIDAD RECIENTE
+   ========================================= */
+.admin-activity-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #4a4a4a;
+    font-size: 0.95rem;
+}
+
+.admin-activity-item:last-child {
+    border-bottom: none;
+}
+
+.admin-activity-item .admin-fecha {
+    color: #888888;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* =========================================
+   BOTONES DE ACCESOS RÁPIDOS
+   ========================================= */
+.btn-shopnow {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #FF9800; /* Naranja principal */
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-shopnow:hover {
+    background-color: #F57C00;
+    color: #ffffff;
+}
+
+.btn-secundario {
+    padding: 12px 20px;
+    border: 2px solid #eaeaea;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #4a4a4a;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-secundario:hover {
+    border-color: var(--verde-oscuro, #2D1B4E);
+    background-color: #f8f5fc;
+    color: var(--verde-oscuro, #2D1B4E);
+}
