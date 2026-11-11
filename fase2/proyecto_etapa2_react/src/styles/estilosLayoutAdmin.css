@@ -1,0 +1,179 @@
+/* =========================================
+   ESTRUCTURA PRINCIPAL (LAYOUT)
+   ========================================= */
+.admin-body {
+    background-color: var(--crema);
+}
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* =========================================
+   BARRA LATERAL (SIDEBAR)
+   ========================================= */
+.admin-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    min-width: 250px;
+    height: 100vh;
+    padding: 24px 0;
+    background-color: var(--verde-oscuro);
+}
+
+.admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px 20px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(217, 184, 255, 0.2);
+    color: var(--verde-claro);
+    font-size: 1.05rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* --- Navegación --- */
+.admin-nav {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.admin-nav .admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-left: 3px solid transparent;
+    color: var(--verde-claro);
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.admin-nav .admin-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #ffffff;
+}
+
+.admin-nav .admin-nav-link.active {
+    border-left-color: var(--naranja);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #3b1f5c;
+    font-weight: 700;
+}
+
+/* --- Botón Cerrar Sesión --- */
+.admin-logout {
+    margin-top: 12px;
+    padding: 12px 20px;
+    border-top: 1px solid rgba(217, 184, 255, 0.2);
+}
+
+.admin-logout .admin-nav-link {
+    color: #f3c6c6;
+}
+
+.admin-logout .admin-nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: #ffb0b0;
+}
+
+/* =========================================
+   CONTENIDO Y BARRA SUPERIOR (TOPBAR)
+   ========================================= */
+.admin-contenido {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.admin-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #ffffff;
+}
+
+.admin-topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: #1b2a17;
+}
+
+.admin-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--verde-brand);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.admin-main {
+    flex-grow: 1;
+    padding: 32px;
+}
+
+/* =========================================
+   DISEÑO RESPONSIVO (MÓVILES)
+   ========================================= */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        position: relative;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        padding: 16px;
+    }
+
+    .admin-brand {
+        margin-bottom: 0;
+        padding: 0 12px;
+        border-bottom: none;
+    }
+
+    .admin-nav {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .admin-nav .admin-nav-link {
+        padding: 10px 14px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+    }
+
+    .admin-nav .admin-nav-link.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--naranja);
+    }
+
+    .admin-logout {
+        margin-top: 0;
+        border-top: none;
+    }
+
+    .admin-main {
+        padding: 20px;
+    }
+}

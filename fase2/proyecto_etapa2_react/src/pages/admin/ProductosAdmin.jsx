@@ -1,3 +1,4 @@
+import '../../styles/estilosProductosAdmin.css'
 import StatCard from './StatCard'
 import { useCart } from '../../context/CartContext'
 import { buscarProducto } from '../../data/productos'

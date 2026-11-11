@@ -1,3 +1,4 @@
+import '../../styles/estilosConfiguracionAdmin.css';
 import { useState } from 'react'
 import { leer, guardar } from '../../utils/storage'
 
@@ -105,7 +106,7 @@ function ConfiguracionAdmin() {
             {mensaje && <div className={`alert alert-${mensaje.tipo}`}>{mensaje.texto}</div>}
           </div>
 
-          <div className="d-flex gap-2">
+          <div className="d-flex gap-2 mt-4">
             <button type="submit" className="btn btn-shopnow">Guardar cambios</button>
             <button type="button" className="btn btn-outline-secondary" onClick={restaurar}>
               Restaurar valores por defecto

@@ -1,0 +1,44 @@
+/* =========================================
+   TARJETA CONTENEDORA (StatCard)
+   ========================================= */
+.admin-stat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding: 24px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efecto de elevación al pasar el mouse */
+.admin-stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* =========================================
+   ETIQUETA (Título superior)
+   ========================================= */
+.admin-stat-label {
+    margin-bottom: 8px;
+    color: #888888;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* =========================================
+   VALOR NUMÉRICO
+   ========================================= */
+.admin-stat-num {
+    color: var(--verde-oscuro, #2D1B4E);
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
