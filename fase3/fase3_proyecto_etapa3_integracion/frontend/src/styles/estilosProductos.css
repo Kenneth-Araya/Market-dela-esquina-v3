@@ -118,3 +118,10 @@
     min-width: 18px;
     text-align: center;
 }
+
+.tarjeta-producto-img-caja img {
+  width: 100%;
+  height: 100%; /* o el alto en píxeles que ya le tuvieras asignado */
+  object-fit: contain; /* <-- ESTO QUITA EL ZOOM Y MUESTRA EL PRODUCTO COMPLETO */
+  /* Si tenías object-fit: cover;, elimínalo o cámbialo por contain */
+}

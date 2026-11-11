@@ -98,7 +98,7 @@ function Productos() {
 
                 <div className="tarjeta-producto-img-caja">
                   {/* Usamos imagenProducto según el backend */}
-                  <img src={producto.imagenProducto} alt={producto.nombreProducto} />
+                  <img src={`/img/${producto.imagenProducto}`} alt={producto.nombreProducto} />
                 </div>
 
                 <h5 className="tarjeta-producto-titulo">{producto.nombreProducto}</h5>
