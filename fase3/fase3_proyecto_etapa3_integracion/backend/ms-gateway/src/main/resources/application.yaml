@@ -6,36 +6,41 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
       routes:
-        - id: ms-inventario
-          uri: lb://ms-inventario
+        # 1. Microservicio de Usuarios (Auth, Usuarios, Ubicaciones)
+        - id: ms-usuario
+          uri: http://localhost:8081
           predicates:
-            - Path=/api/v1/inventario/**
+            - Path=/api/usuarios/**, /api/auth/**, /api/regiones/**
 
-        - id: ms-productos
-          uri: lb://ms-producto
+        # 2. Microservicio de Catálogo (Productos, Categorías, Inventario)
+        - id: ms-catalogo
+          uri: http://localhost:8082
           predicates:
-            - Path=/api/v1/productos/**
+            - Path=/api/productos/**, /api/categorias/**, /api/inventario/**
 
-        - id: ms-boletas
-          uri: lb://ms-boleta
-          predicates:
-            - Path=/api/v1/boletas/**
-
-        - id: ms-usuarios
-          uri: lb://ms-usuarios
-          predicates:
-            - Path=/api/v1/usuarios/**
-
+        # 3. Microservicio de Ventas (Ventas, Carrito, Boletas)
         - id: ms-ventas
-          uri: lb://ms-venta
+          uri: http://localhost:8083
           predicates:
-            - Path=/api/v1/ventas/**
+            - Path=/api/ventas/**, /api/carrito/**, /api/boletas/**
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+        # 4. Microservicio de Administración (Configuración, Contacto, Reportes)
+        - id: ms-administracion
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/configuracion/**, /api/contactos/**, /api/reportes/**
+
+      # Configuración CORS para permitir que React (puerto 5173) se conecte
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
