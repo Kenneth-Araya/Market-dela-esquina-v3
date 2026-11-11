@@ -7,10 +7,11 @@ function Login() {
   const [contrasena, setContrasena] = useState('');
   const [error, setError] = useState('');
   const [exito, setExito] = useState(false);
+  const [cargando, setCargando] = useState(false);
 
   const navigate = useNavigate();
 
-  const manejarSubmit = (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault();
 
     // Limpiamos mensajes previos
@@ -49,41 +50,63 @@ function Login() {
       return;
     }
 
-    // 5. VERIFICAMOS QUE EL USUARIO EXISTA EN LOS REGISTRADOS Y SU CONTRASEÑA COINCIDA
-    const usuariosGuardados = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]');
-    const usuarioEncontrado = usuariosGuardados.find(
-      (u) => u.correo.toLowerCase() === correoLimpio
-    );
+    // 5. LLAMAMOS AL BACKEND (Gateway -> ms-usuario -> Supabase)
+    setCargando(true);
+    try {
+      const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          correoUsuario: correoLimpio,
+          contrasenaUsuario: contrasenaLimpia
+        })
+      });
 
-    if (!usuarioEncontrado) {
-      setError('Este correo no está registrado. Por favor regístrate primero.');
-      return;
+      if (!respuesta.ok) {
+        // Intentamos leer {"mensaje": "..."}; si no es JSON, usamos el texto plano
+        const texto = await respuesta.text();
+        let mensaje = '';
+        try {
+          mensaje = JSON.parse(texto).mensaje;
+        } catch {
+          mensaje = texto;
+        }
+        console.error('Error del backend:', respuesta.status, texto);
+        setError(mensaje || 'Correo o contraseña incorrectos.');
+        return;
+      }
+
+      const datos = await respuesta.json();
+
+      // 6. GUARDAMOS LA SESIÓN Y AVISAMOS AL NAVBAR
+      // Mismas claves que usaba antes, para que el resto de la app no cambie
+      const datosUsuario = {
+        id: datos.idUsuario,
+        nombre: datos.nombreUsuario,
+        correo: datos.correoUsuario,
+        tipoUsuario: datos.tipoUsuario, // llega en mayúsculas: ADMINISTRADOR, CLIENTE, VENDEDOR
+        inicial: datos.correoUsuario.charAt(0).toUpperCase(),
+        avatar: 'https://i.pravatar.cc/100?img=68'
+      };
+
+      localStorage.setItem('token', datos.token);
+      localStorage.setItem('usuarioActivo', JSON.stringify(datosUsuario));
+      window.dispatchEvent(new Event('sesionActualizada'));
+
+      setExito(true);
+
+      // Redirigimos al Home luego de un breve instante
+      setTimeout(() => {
+        navigate('/');
+      }, 800);
+    } catch (err) {
+      console.error('Error de conexión:', err);
+      setError('Error al conectar con el servidor. Revisa que el backend esté corriendo.');
+    } finally {
+      setCargando(false);
     }
-
-    if (usuarioEncontrado.contrasena !== contrasenaLimpia) {
-      setError('Contraseña incorrecta. Inténtalo nuevamente.');
-      return;
-    }
-
-    // 6. GUARDAMOS LA SESIÓN EN LOCALSTORAGE Y AVISAMOS AL NAVBAR
-    const datosUsuario = {
-      nombre: usuarioEncontrado.nombre,
-      correo: usuarioEncontrado.correo,
-      tipoUsuario: usuarioEncontrado.tipoUsuario,
-      inicial: usuarioEncontrado.correo.charAt(0).toUpperCase(),
-      avatar: 'https://i.pravatar.cc/100?img=68'
-    };
-
-    localStorage.setItem('usuarioActivo', JSON.stringify(datosUsuario));
-    window.dispatchEvent(new Event('sesionActualizada'));
-
-    setExito(true);
-
-    // Redirigimos al Home luego de un breve instante
-    setTimeout(() => {
-      navigate('/');
-    }, 800);
   };
+
   return (
     <main className="contenedor-login pt-5">
       {/* Botón Admin en la esquina superior derecha */}
@@ -150,8 +173,8 @@ function Login() {
                   </div>
                 )}
 
-                <button type="submit" className="btn btn-morado w-100 mt-4">
-                  Iniciar
+                <button type="submit" className="btn btn-morado w-100 mt-4" disabled={cargando}>
+                  {cargando ? 'Ingresando...' : 'Iniciar'}
                 </button>
               </form>
             </div>
