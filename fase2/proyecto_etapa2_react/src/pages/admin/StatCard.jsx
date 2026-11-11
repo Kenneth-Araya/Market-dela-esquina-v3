@@ -1,3 +1,5 @@
+import '../../styles/estilosStatCard.css'
+
 // Tarjeta de estadistica reutilizable del panel de administracion
 function StatCard({ etiqueta, valor }) {
   return (

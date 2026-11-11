@@ -1,3 +1,4 @@
+import '../../styles/estilosVentasAdmin.css'
 import StatCard from './StatCard'
 import { leer, pesos } from '../../utils/storage'
 

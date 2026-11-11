@@ -1,3 +1,4 @@
+import '../../styles/estilosUsuariosAdmin.css'
 import { Link } from 'react-router-dom'
 import StatCard from './StatCard'
 import { leer } from '../../utils/storage'

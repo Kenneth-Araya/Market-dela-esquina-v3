@@ -1,0 +1,72 @@
+/* =========================================
+   TÍTULO DE LA SECCIÓN
+   ========================================= */
+.section-title {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+    color: var(--verde-oscuro, #2D1B4E);
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+/* =========================================
+   TARJETA CONTENEDORA
+   ========================================= */
+.admin-card {
+    padding: 32px;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+}
+
+.admin-card h5 {
+    margin-bottom: 24px;
+    color: var(--verde-oscuro, #2D1B4E);
+    font-weight: 700;
+}
+
+/* =========================================
+   TABLA DE HISTORIAL DE VENTAS
+   ========================================= */
+.admin-tabla {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.admin-tabla thead th {
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+    color: var(--verde-oscuro, #2D1B4E);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.admin-tabla td, 
+.admin-tabla th {
+    padding: 16px 12px;
+    border-bottom: 1px solid #f9f9f9;
+    color: #4a4a4a;
+    vertical-align: middle;
+}
+
+/* --- Efecto al pasar el mouse --- */
+.admin-tabla tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.admin-tabla tbody tr:hover {
+    background-color: #f8f5fc;
+}
+
+/* =========================================
+   ESTADOS VACÍOS
+   ========================================= */
+.text-muted {
+    color: #888888 !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
