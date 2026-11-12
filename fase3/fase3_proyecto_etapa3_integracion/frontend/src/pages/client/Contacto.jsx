@@ -13,7 +13,7 @@ function Contacto() {
     const [exito, setExito] = useState(false);
 
     // 3. Función que se ejecuta al enviar el formulario
-    const manejarEnvio = (e) => {
+    const manejarEnvio = async (e) => {
         e.preventDefault(); // Evita que la página se recargue y se pierdan los datos
 
         // Reiniciamos alertas previas
@@ -47,27 +47,48 @@ function Contacto() {
             return;
         }
 
-        // Guardamos el mensaje en localStorage
-        const mensajesGuardados = JSON.parse(localStorage.getItem('mensajesContacto') || '[]');
+        // Enviamos el mensaje al backend (Gateway -> ms-administracion -> Supabase)
         const nuevoMensaje = {
-            id: Date.now(),
-            nombre: nombreLimpio,
-            correo: correoLimpio,
-            contenido: contenidoLimpio,
-            fecha: new Date().toLocaleDateString('es-CL')
+            nombreContacto: nombreLimpio,
+            correoContacto: correoLimpio,
+            contenidoContacto: contenidoLimpio
         };
-        localStorage.setItem('mensajesContacto', JSON.stringify([...mensajesGuardados, nuevoMensaje]));
 
-        // Mostramos confirmación de éxito y limpiamos el formulario
-        setExito(true);
-        setNombre('');
-        setCorreo('');
-        setContenido('');
+        try {
+            const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/contactos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(nuevoMensaje)
+            });
 
-        // Ocultamos el mensaje de éxito automáticamente después de 8 segundos
-        setTimeout(() => {
-            setExito(false);
-        }, 8000);
+            if (!respuesta.ok) {
+                // Intentamos leer {"mensaje": "..."}; si no es JSON, usamos el texto plano
+                const texto = await respuesta.text();
+                let mensaje = '';
+                try {
+                    mensaje = JSON.parse(texto).mensaje;
+                } catch {
+                    mensaje = texto;
+                }
+                console.error('Error del backend:', respuesta.status, texto);
+                setError(mensaje || 'No se pudo enviar el mensaje.');
+                return;
+            }
+
+            // Mostramos confirmación de éxito y limpiamos el formulario
+            setExito(true);
+            setNombre('');
+            setCorreo('');
+            setContenido('');
+
+            // Ocultamos el mensaje de éxito automáticamente después de 8 segundos
+            setTimeout(() => {
+                setExito(false);
+            }, 8000);
+        } catch (err) {
+            console.error('Error de conexión:', err);
+            setError('Error al conectar con el servidor. Revisa que el backend esté corriendo.');
+        }
     };
 
     return (

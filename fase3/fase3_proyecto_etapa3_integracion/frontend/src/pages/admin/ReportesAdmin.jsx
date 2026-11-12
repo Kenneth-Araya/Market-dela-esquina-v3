@@ -1,40 +1,61 @@
+import { useState, useEffect } from 'react'
 import '../../styles/estilosReportesAdmin.css'
 import StatCard from './StatCard'
-import { leer, pesos } from '../../utils/storage'
+import { pesos } from '../../utils/storage'
 
 function ReportesAdmin() {
-  const ventas = leer('ventas', [])
-  const usuarios = leer('usuarios', [])
-
-  // Agrupamos las ventas por producto
-  const porProducto = {}
-  ventas.forEach((v) =>
-    v.productos.forEach((p) => {
-      const actual = porProducto[p.nombre] || { nombre: p.nombre, unidades: 0, ingresos: 0 }
-      actual.unidades += p.cantidad
-      actual.ingresos += p.subtotal
-      porProducto[p.nombre] = actual
-    }),
-  )
-  const filasProductos = Object.values(porProducto).sort((a, b) => b.unidades - a.unidades)
-
-  // Agrupamos los usuarios por tipo
-  const porTipo = {}
-  usuarios.forEach((u) => {
-    porTipo[u.tipo] = (porTipo[u.tipo] || 0) + 1
+  // Reportes que vienen del backend (Gateway -> ms-administracion)
+  const [general, setGeneral] = useState({
+    ingresosTotales: 0,
+    ventasTotales: 0,
+    productoEstrella: null,
+    usuariosRegistrados: 0,
   })
+  const [ventasPorProducto, setVentasPorProducto] = useState([])
+  const [usuariosPorTipo, setUsuariosPorTipo] = useState([])
 
-  const ingresos = ventas.reduce((acc, v) => acc + v.total, 0)
+  useEffect(() => {
+    const cargarReportes = async () => {
+      try {
+        const respuestaGeneral = await fetch(`${import.meta.env.VITE_API_URL}/reportes/general`)
+        const respuestaProductos = await fetch(`${import.meta.env.VITE_API_URL}/reportes/ventas-por-producto`)
+        const respuestaTipos = await fetch(`${import.meta.env.VITE_API_URL}/reportes/usuarios-por-tipo`)
+
+        if (respuestaGeneral.ok) {
+          setGeneral(await respuestaGeneral.json())
+        } else {
+          console.error('Error al obtener el reporte general del servidor')
+        }
+        if (respuestaProductos.ok) {
+          setVentasPorProducto(await respuestaProductos.json())
+        } else {
+          console.error('Error al obtener las ventas por producto del servidor')
+        }
+        if (respuestaTipos.ok) {
+          setUsuariosPorTipo(await respuestaTipos.json())
+        } else {
+          console.error('Error al obtener los usuarios por tipo del servidor')
+        }
+      } catch (error) {
+        console.error('Error conectando con el backend:', error)
+      }
+    }
+
+    cargarReportes()
+  }, [])
+
+  // Ordenamos los productos del más vendido al menos vendido
+  const filasProductos = [...ventasPorProducto].sort((a, b) => b.unidadesVendidas - a.unidadesVendidas)
 
   return (
     <>
       <h2 className="section-title">Reporte general del negocio</h2>
 
       <div className="row g-4 mb-4">
-        <StatCard etiqueta="Ingresos totales" valor={pesos(ingresos)} />
-        <StatCard etiqueta="Ventas totales" valor={ventas.length} />
-        <StatCard etiqueta="Producto estrella" valor={filasProductos[0]?.nombre ?? '-'} />
-        <StatCard etiqueta="Usuarios registrados" valor={usuarios.length} />
+        <StatCard etiqueta="Ingresos totales" valor={pesos(general.ingresosTotales)} />
+        <StatCard etiqueta="Ventas totales" valor={general.ventasTotales} />
+        <StatCard etiqueta="Producto estrella" valor={general.productoEstrella ?? '-'} />
+        <StatCard etiqueta="Usuarios registrados" valor={general.usuariosRegistrados} />
       </div>
 
       <div className="row g-4">
@@ -52,10 +73,10 @@ function ReportesAdmin() {
                 </thead>
                 <tbody>
                   {filasProductos.map((f) => (
-                    <tr key={f.nombre}>
-                      <td>{f.nombre}</td>
-                      <td>{f.unidades}</td>
-                      <td>{pesos(f.ingresos)}</td>
+                    <tr key={f.idProducto}>
+                      <td>{f.nombreProducto}</td>
+                      <td>{f.unidadesVendidas}</td>
+                      <td>{pesos(f.ingresosGenerados)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -79,16 +100,16 @@ function ReportesAdmin() {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(porTipo).map(([tipo, cantidad]) => (
-                    <tr key={tipo}>
-                      <td>{tipo}</td>
-                      <td>{cantidad}</td>
+                  {usuariosPorTipo.map((u) => (
+                    <tr key={u.tipoUsuario}>
+                      <td>{u.tipoUsuario}</td>
+                      <td>{u.cantidad}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {usuarios.length === 0 && (
+            {usuariosPorTipo.length === 0 && (
               <p className="text-muted text-center py-4">No hay usuarios registrados para generar el reporte.</p>
             )}
           </div>

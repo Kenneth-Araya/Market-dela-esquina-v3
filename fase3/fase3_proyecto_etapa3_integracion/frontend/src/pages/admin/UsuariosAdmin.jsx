@@ -1,12 +1,31 @@
+import { useState, useEffect } from 'react'
 import '../../styles/estilosUsuariosAdmin.css'
 import { Link } from 'react-router-dom'
 import StatCard from './StatCard'
-import { leer } from '../../utils/storage'
 
 function UsuariosAdmin() {
-  // Usuarios guardados desde la pagina de Registro
-  const usuarios = leer('usuarios', [])
-  const contar = (tipo) => usuarios.filter((u) => u.tipo === tipo).length
+  // Usuarios que vienen del backend (Gateway -> ms-usuario)
+  const [usuarios, setUsuarios] = useState([])
+
+  useEffect(() => {
+    const cargarUsuarios = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`)
+        if (respuesta.ok) {
+          setUsuarios(await respuesta.json())
+        } else {
+          console.error('Error al obtener los usuarios del servidor')
+        }
+      } catch (error) {
+        console.error('Error conectando con el backend:', error)
+      }
+    }
+
+    cargarUsuarios()
+  }, [])
+
+  // El tipo llega en mayúsculas: ADMINISTRADOR, CLIENTE, VENDEDOR
+  const contar = (tipo) => usuarios.filter((u) => u.tipoUsuario === tipo).length
 
   return (
     <>
@@ -17,9 +36,9 @@ function UsuariosAdmin() {
 
       <div className="row g-4 mb-4">
         <StatCard etiqueta="Usuarios totales" valor={usuarios.length} />
-        <StatCard etiqueta="Administradores" valor={contar('Administrador')} />
-        <StatCard etiqueta="Clientes" valor={contar('Cliente')} />
-        <StatCard etiqueta="Vendedores" valor={contar('Vendedor')} />
+        <StatCard etiqueta="Administradores" valor={contar('ADMINISTRADOR')} />
+        <StatCard etiqueta="Clientes" valor={contar('CLIENTE')} />
+        <StatCard etiqueta="Vendedores" valor={contar('VENDEDOR')} />
       </div>
 
       <div className="admin-card">
@@ -38,15 +57,15 @@ function UsuariosAdmin() {
             </thead>
             <tbody>
               {usuarios.map((u) => (
-                <tr key={u.run + u.correo}>
-                  <td>{u.nombre} {u.apellidos}</td>
-                  <td>{u.run}</td>
-                  <td>{u.correo}</td>
-                  <td>{u.tipo}</td>
-                  <td>{u.region} / {u.comuna}</td>
+                <tr key={u.id}>
+                  <td>{u.nombreUsuario} {u.apellidosUsuario}</td>
+                  <td>{u.runUsuario}</td>
+                  <td>{u.correoUsuario}</td>
+                  <td>{u.tipoUsuario}</td>
+                  <td>{u.regionUsuario} / {u.comunaUsuario}</td>
                   <td>
-                    <span className={u.estado === 'Activo' ? 'admin-badge-activo' : 'admin-badge-inactivo'}>
-                      {u.estado}
+                    <span className={u.estadoUsuario === 'ACTIVO' ? 'admin-badge-activo' : 'admin-badge-inactivo'}>
+                      {u.estadoUsuario}
                     </span>
                   </td>
                 </tr>

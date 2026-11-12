@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../styles/estilosCarrito.css';
 
 function Carrito() {
@@ -7,6 +8,11 @@ function Carrito() {
         const carritoGuardado = localStorage.getItem('carritoMarket');
         return carritoGuardado ? JSON.parse(carritoGuardado) : [];
     });
+
+    // Evita que se presione "Finalizar Venta" dos veces mientras el backend responde
+    const [procesando, setProcesando] = useState(false);
+
+    const navigate = useNavigate();
 
     // Cada vez que 'carrito' cambia, guardamos en localStorage y avisamos al Navbar
     useEffect(() => {
@@ -50,13 +56,73 @@ function Carrito() {
         setCarrito([]);
     };
 
-    const finalizarCompra = () => {
+    // Lee {"mensaje": "..."} del backend; si no es JSON, usa el texto plano
+    const leerMensajeError = async (respuesta) => {
+        const texto = await respuesta.text();
+        let mensaje = '';
+        try {
+            mensaje = JSON.parse(texto).mensaje;
+        } catch {
+            mensaje = texto;
+        }
+        console.error('Error del backend:', respuesta.status, texto);
+        return mensaje || 'No se pudo completar la compra.';
+    };
+
+    const finalizarCompra = async () => {
         if (carrito.length === 0) {
             alert('Tu carrito está vacío. Agrega productos antes de finalizar la venta.');
             return;
         }
-        alert('¡Compra realizada con éxito! Gracias por preferir Market De La Esquina.');
-        setCarrito([]);
+
+        // La venta se registra a nombre del usuario que inició sesión en el Login
+        const sesionGuardada = localStorage.getItem('usuarioActivo');
+        const usuario = sesionGuardada ? JSON.parse(sesionGuardada) : null;
+        if (!usuario) {
+            alert('Debes iniciar sesión para finalizar la compra.');
+            navigate('/login');
+            return;
+        }
+
+        // Gateway -> ms-ventas (-> ms-catalogo para descontar el stock)
+        setProcesando(true);
+        try {
+            const base = `${import.meta.env.VITE_API_URL}`;
+            const headers = { 'Content-Type': 'application/json' };
+
+            // 1. Dejamos el carrito del backend igual al que se ve en pantalla
+            await fetch(`${base}/carrito/${usuario.id}`, { method: 'DELETE' });
+
+            for (const item of carrito) {
+                const respuestaItem = await fetch(`${base}/carrito/${usuario.id}/items`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ idProducto: item.id, cantidad: item.cantidad })
+                });
+                if (!respuestaItem.ok) {
+                    alert(await leerMensajeError(respuestaItem));
+                    return;
+                }
+            }
+
+            // 2. Finalizamos la compra (crea la venta, su detalle y descuenta el stock)
+            const respuesta = await fetch(`${base}/ventas/checkout/${usuario.id}`, {
+                method: 'POST',
+                headers
+            });
+            if (!respuesta.ok) {
+                alert(await leerMensajeError(respuesta));
+                return;
+            }
+
+            alert('¡Compra realizada con éxito! Gracias por preferir Market De La Esquina.');
+            setCarrito([]);
+        } catch (err) {
+            console.error('Error de conexión:', err);
+            alert('Error al conectar con el servidor. Revisa que el backend esté corriendo.');
+        } finally {
+            setProcesando(false);
+        }
     };
 
     const calcularTotal = () => {
@@ -93,7 +159,8 @@ function Carrito() {
 
                                     return (
                                         <div key={item.id} className="item-carrito d-flex align-items-center gap-3 flex-wrap">
-                                            <img src={item.img} alt={item.nombre} className="img-item-carrito" />
+                                            {/* Las imágenes viven en public/img/ (igual que en Productos y Home) */}
+                                            <img src={`/img/${item.img}`} alt={item.nombre} className="img-item-carrito" />
 
                                             {/* Información del producto */}
                                             <div className="flex-grow-1">
@@ -167,6 +234,7 @@ function Carrito() {
                         <button
                             className="btn-finalizar-venta w-100 mb-2"
                             onClick={finalizarCompra}
+                            disabled={procesando}
                         >
                             Finalizar Venta
                         </button>

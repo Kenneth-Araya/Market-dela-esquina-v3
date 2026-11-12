@@ -1,7 +1,7 @@
 import '../../styles/estilosConfiguracionAdmin.css';
-import { useState } from 'react'
-import { leer, guardar } from '../../utils/storage'
+import { useState, useEffect } from 'react'
 
+// Valores que se muestran mientras llegan los datos reales del backend
 const porDefecto = {
   nombreTienda: 'Market De La Esquina',
   correoContacto: 'contacto@marketdelaesquina.cl',
@@ -9,20 +9,61 @@ const porDefecto = {
   moneda: 'CLP',
   direccionTienda: 'Av. Siempre Viva 742, Santiago',
   horarioAtencion: 'Lunes a sábado, 9:00 - 20:00',
-  notificacionesVentas: false,
+  notificarNuevasVentas: false,
   modoMantenimiento: false,
 }
 
+// El backend puede devolver campos opcionales en null; los pasamos a texto vacío para los inputs
+const normalizar = (datos) => ({
+  ...porDefecto,
+  ...datos,
+  correoContacto: datos.correoContacto ?? '',
+  telefonoContacto: datos.telefonoContacto ?? '',
+  direccionTienda: datos.direccionTienda ?? '',
+  horarioAtencion: datos.horarioAtencion ?? '',
+})
+
+// Lee {"mensaje": "..."} del backend; si no es JSON, usa el texto plano
+const leerMensajeError = async (respuesta) => {
+  const texto = await respuesta.text()
+  let mensaje = ''
+  try {
+    mensaje = JSON.parse(texto).mensaje
+  } catch {
+    mensaje = texto
+  }
+  console.error('Error del backend:', respuesta.status, texto)
+  return mensaje || 'No se pudo completar la operación.'
+}
+
 function ConfiguracionAdmin() {
-  const [config, setConfig] = useState(() => ({ ...porDefecto, ...leer('configuracion', {}) }))
+  const [config, setConfig] = useState(porDefecto)
   const [mensaje, setMensaje] = useState(null) // { tipo, texto }
+
+  // Cargamos la configuración guardada (Gateway -> ms-administracion)
+  useEffect(() => {
+    const cargarConfiguracion = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/configuracion`)
+        if (respuesta.ok) {
+          setConfig(normalizar(await respuesta.json()))
+        } else {
+          console.error('Error al obtener la configuración del servidor')
+        }
+      } catch (error) {
+        console.error('Error conectando con el backend:', error)
+      }
+    }
+
+    cargarConfiguracion()
+  }, [])
 
   const cambiar = (e) => {
     const { id, type, value, checked } = e.target
     setConfig((c) => ({ ...c, [id]: type === 'checkbox' ? checked : value }))
   }
 
-  const guardarCambios = (e) => {
+  const guardarCambios = async (e) => {
     e.preventDefault()
     if (!config.nombreTienda.trim()) {
       return setMensaje({ tipo: 'danger', texto: 'El nombre de la tienda es obligatorio.' })
@@ -30,14 +71,42 @@ function ConfiguracionAdmin() {
     if (config.correoContacto.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.correoContacto.trim())) {
       return setMensaje({ tipo: 'danger', texto: 'Ingresa un correo de contacto válido.' })
     }
-    guardar('configuracion', config)
-    setMensaje({ tipo: 'success', texto: 'Configuración guardada correctamente.' })
+
+    try {
+      const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/configuracion`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config)
+      })
+
+      if (!respuesta.ok) {
+        return setMensaje({ tipo: 'danger', texto: await leerMensajeError(respuesta) })
+      }
+
+      setConfig(normalizar(await respuesta.json()))
+      setMensaje({ tipo: 'success', texto: 'Configuración guardada correctamente.' })
+    } catch (error) {
+      console.error('Error de conexión:', error)
+      setMensaje({ tipo: 'danger', texto: 'Error al conectar con el servidor. Revisa que el backend esté corriendo.' })
+    }
   }
 
-  const restaurar = () => {
-    setConfig(porDefecto)
-    guardar('configuracion', porDefecto)
-    setMensaje({ tipo: 'success', texto: 'Se restauraron los valores por defecto.' })
+  const restaurar = async () => {
+    try {
+      const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/configuracion/restaurar`, {
+        method: 'POST'
+      })
+
+      if (!respuesta.ok) {
+        return setMensaje({ tipo: 'danger', texto: await leerMensajeError(respuesta) })
+      }
+
+      setConfig(normalizar(await respuesta.json()))
+      setMensaje({ tipo: 'success', texto: 'Se restauraron los valores por defecto.' })
+    } catch (error) {
+      console.error('Error de conexión:', error)
+      setMensaje({ tipo: 'danger', texto: 'Error al conectar con el servidor. Revisa que el backend esté corriendo.' })
+    }
   }
 
   return (
@@ -87,9 +156,9 @@ function ConfiguracionAdmin() {
           </div>
 
           <div className="form-check form-switch mb-3">
-            <input className="form-check-input" type="checkbox" id="notificacionesVentas"
-              checked={config.notificacionesVentas} onChange={cambiar} />
-            <label className="form-check-label" htmlFor="notificacionesVentas">
+            <input className="form-check-input" type="checkbox" id="notificarNuevasVentas"
+              checked={config.notificarNuevasVentas} onChange={cambiar} />
+            <label className="form-check-label" htmlFor="notificarNuevasVentas">
               Recibir notificaciones de nuevas ventas
             </label>
           </div>

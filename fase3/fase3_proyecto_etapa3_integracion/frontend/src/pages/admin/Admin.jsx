@@ -1,24 +1,47 @@
+import { useState, useEffect } from 'react';
 import '../../styles/estilosAdmin.css';
 import { Link } from 'react-router-dom';
 import StatCard from './StatCard';
+import { pesos } from '../../utils/storage';
 
 const actividad = [
   { texto: '📦 Producto "Pan amasado casero" agregado', fecha: 'Hoy' },
   { texto: '👤 Usuario "Bairo Valencia" registrado', fecha: 'Ayer' },
+  { texto: '👤 Usuario "Kenneth Araya" registrado', fecha: 'Hoy' }, 
   { texto: '🛒 Venta realizada por $12.400', fecha: 'Ayer' },
   { texto: '📦 Producto "Queso gauda laminado" editado', fecha: 'Hace 2 días' },
 ];
 
 function Admin() {
+  // Estadísticas que vienen del backend (Gateway -> ms-administracion)
+  const [dashboard, setDashboard] = useState({ productos: 0, usuarios: 0, ventasMes: 0, ingresosMes: 0 });
+
+  useEffect(() => {
+    const cargarDashboard = async () => {
+      try {
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/reportes/dashboard`);
+        if (respuesta.ok) {
+          setDashboard(await respuesta.json());
+        } else {
+          console.error('Error al obtener el dashboard del servidor');
+        }
+      } catch (error) {
+        console.error('Error conectando con el backend:', error);
+      }
+    };
+
+    cargarDashboard();
+  }, []);
+
   return (
     <>
       <h2 className="section-title">Bienvenido de vuelta</h2>
 
       <div className="row g-4 mb-4">
-        <StatCard etiqueta="Productos" valor="24" />
-        <StatCard etiqueta="Usuarios" valor="12" />
-        <StatCard etiqueta="Ventas del mes" valor="37" />
-        <StatCard etiqueta="Ingresos del mes" valor="$482k" />
+        <StatCard etiqueta="Productos" valor={dashboard.productos} />
+        <StatCard etiqueta="Usuarios" valor={dashboard.usuarios} />
+        <StatCard etiqueta="Ventas del mes" valor={dashboard.ventasMes} />
+        <StatCard etiqueta="Ingresos del mes" valor={pesos(dashboard.ingresosMes)} />
       </div>
 
       <div className="row g-4">

@@ -188,20 +188,75 @@ describe('Pruebas unitarias para Carrito de Compras', () => {
     expect(carritoGuardado).toEqual([])
   })
 
-  test('finaliza la compra exitosamente y vacía el carrito', async () => {
+  test('finalizar compra sin sesión iniciada pide iniciar sesión y no llama al backend', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+
+    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
+    const { user } = mostrar()
+
+    await user.click(screen.getByRole('button', { name: /Finalizar Venta/i }))
+
+    expect(window.alert).toHaveBeenCalledWith('Debes iniciar sesión para finalizar la compra.')
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    // El carrito se mantiene intacto
+    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
+    vi.unstubAllGlobals()
+  })
+
+  test('finaliza la compra exitosamente contra el backend y vacía el carrito', async () => {
+    const fetchMock = vi.fn(() =>
+      Promise.resolve({ ok: true, json: async () => ({}), text: async () => '' })
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    localStorage.setItem('usuarioActivo', JSON.stringify({ id: 7, nombre: 'Test' }))
     localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
     const { user } = mostrar()
 
     const btnFinalizar = screen.getByRole('button', { name: /Finalizar Venta/i })
     await user.click(btnFinalizar)
 
+    // El carrito debe quedar limpio en pantalla y en localStorage
+    expect(await screen.findByText('Tu carrito está vacío')).toBeInTheDocument()
+
     expect(window.alert).toHaveBeenCalledWith(
       '¡Compra realizada con éxito! Gracias por preferir Market De La Esquina.'
     )
-
-    // El carrito debe quedar limpio en pantalla y en localStorage
-    expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument()
     const carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
     expect(carritoGuardado).toEqual([])
+
+    // Se llamó al checkout del usuario 7
+    const urls = fetchMock.mock.calls.map((llamada) => llamada[0])
+    expect(urls.some((url) => url.endsWith('/ventas/checkout/7'))).toBe(true)
+    vi.unstubAllGlobals()
+  })
+
+  test('si el backend rechaza la compra muestra el mensaje y conserva el carrito', async () => {
+    const fetchMock = vi.fn((url) => {
+      if (String(url).includes('/ventas/checkout/')) {
+        return Promise.resolve({
+          ok: false,
+          status: 409,
+          text: async () => JSON.stringify({ mensaje: 'Stock insuficiente.' }),
+        })
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}), text: async () => '' })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    localStorage.setItem('usuarioActivo', JSON.stringify({ id: 7, nombre: 'Test' }))
+    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
+    const { user } = mostrar()
+
+    await user.click(screen.getByRole('button', { name: /Finalizar Venta/i }))
+
+    await vi.waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Stock insuficiente.')
+    })
+    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
+    vi.unstubAllGlobals()
   })
 })
