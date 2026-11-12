@@ -4,17 +4,21 @@ import { Link } from 'react-router-dom';
 import StatCard from './StatCard';
 import { pesos } from '../../utils/storage';
 
-const actividad = [
-  { texto: '📦 Producto "Pan amasado casero" agregado', fecha: 'Hoy' },
-  { texto: '👤 Usuario "Bairo Valencia" registrado', fecha: 'Ayer' },
-  { texto: '👤 Usuario "Kenneth Araya" registrado', fecha: 'Hoy' }, 
-  { texto: '🛒 Venta realizada por $12.400', fecha: 'Ayer' },
-  { texto: '📦 Producto "Queso gauda laminado" editado', fecha: 'Hace 2 días' },
-];
+// Convierte una fecha en "Hoy", "Ayer" o "Hace N días"
+const textoFecha = (iso) => {
+  const inicioDia = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const dias = Math.round((inicioDia(new Date()) - inicioDia(new Date(iso))) / 86400000);
+  if (dias <= 0) return 'Hoy';
+  if (dias === 1) return 'Ayer';
+  return `Hace ${dias} días`;
+};
 
 function Admin() {
   // Estadísticas que vienen del backend (Gateway -> ms-administracion)
   const [dashboard, setDashboard] = useState({ productos: 0, usuarios: 0, ventasMes: 0, ingresosMes: 0 });
+
+  // Actividad reciente: se arma con los usuarios, ventas y mensajes de contacto más nuevos
+  const [actividad, setActividad] = useState([]);
 
   useEffect(() => {
     const cargarDashboard = async () => {
@@ -31,6 +35,73 @@ function Admin() {
     };
 
     cargarDashboard();
+  }, []);
+
+  useEffect(() => {
+    const cargarActividad = async () => {
+      try {
+        const respuestaUsuarios = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`);
+        const respuestaVentas = await fetch(`${import.meta.env.VITE_API_URL}/ventas`);
+        const respuestaContactos = await fetch(`${import.meta.env.VITE_API_URL}/contactos`);
+
+        const eventos = [];
+
+        if (respuestaUsuarios.ok) {
+          const usuarios = await respuestaUsuarios.json();
+          usuarios.forEach((u) => {
+            if (u.fechaRegistroUsuario) {
+              eventos.push({
+                id: `usuario-${u.id}`,
+                texto: `👤 Usuario "${u.nombreUsuario} ${u.apellidosUsuario}" registrado`,
+                fecha: u.fechaRegistroUsuario,
+              });
+            }
+          });
+        } else {
+          console.error('Error al obtener los usuarios del servidor');
+        }
+
+        if (respuestaVentas.ok) {
+          const ventas = await respuestaVentas.json();
+          ventas.forEach((v) => {
+            if (v.venta.fechaVenta) {
+              eventos.push({
+                id: `venta-${v.venta.id}`,
+                texto: v.venta.estadoVenta === 'ANULADA'
+                  ? `🛒 Venta #${v.venta.id} anulada`
+                  : `🛒 Venta #${v.venta.id} realizada por ${pesos(v.venta.totalVenta)}`,
+                fecha: v.venta.fechaVenta,
+              });
+            }
+          });
+        } else {
+          console.error('Error al obtener las ventas del servidor');
+        }
+
+        if (respuestaContactos.ok) {
+          const contactos = await respuestaContactos.json();
+          contactos.forEach((c) => {
+            if (c.fechaEnvioContacto) {
+              eventos.push({
+                id: `contacto-${c.id}`,
+                texto: `✉️ Mensaje de contacto de "${c.nombreContacto}"`,
+                fecha: c.fechaEnvioContacto,
+              });
+            }
+          });
+        } else {
+          console.error('Error al obtener los mensajes de contacto del servidor');
+        }
+
+        // Dejamos los 5 eventos más recientes
+        eventos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        setActividad(eventos.slice(0, 5));
+      } catch (error) {
+        console.error('Error conectando con el backend:', error);
+      }
+    };
+
+    cargarActividad();
   }, []);
 
   return (
@@ -72,11 +143,14 @@ function Admin() {
             <h5>Actividad reciente</h5>
             <div className="mt-4">
               {actividad.map((a) => (
-                <div className="admin-activity-item" key={a.texto}>
+                <div className="admin-activity-item" key={a.id}>
                   <span>{a.texto}</span>
-                  <span className="admin-fecha">{a.fecha}</span>
+                  <span className="admin-fecha">{textoFecha(a.fecha)}</span>
                 </div>
               ))}
+              {actividad.length === 0 && (
+                <p className="text-muted text-center py-4">No hay actividad reciente.</p>
+              )}
             </div>
           </div>
         </div>

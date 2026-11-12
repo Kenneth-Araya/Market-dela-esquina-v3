@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import PublicLayout from './components/PublicLayout'
 import AdminLayout from './components/AdminLayout'
+import RutaProtegida from './components/RutaProtegida'
 
 // IMPORTAMOS LAS PAGINAS DESDE LA NUEVA CARPETA CLIENT/
 // CORRESPONDERIA AL PANEL DEL CLIENTE 
@@ -39,8 +40,15 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
-      {/* Panel de administracion */}
-      <Route path="/admin" element={<AdminLayout />}>
+      {/* Panel de administracion protegido */}
+      <Route
+        path="/admin"
+        element={
+          <RutaProtegida rolRequerido="ADMINISTRADOR">
+            <AdminLayout />
+          </RutaProtegida>
+        }
+      >
         <Route index element={<Admin />} />
         <Route path="productos" element={<ProductosAdmin />} />
         <Route path="usuarios" element={<UsuariosAdmin />} />
