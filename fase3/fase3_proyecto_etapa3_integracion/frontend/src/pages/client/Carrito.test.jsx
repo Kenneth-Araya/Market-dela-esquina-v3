@@ -1,262 +1,562 @@
 
-import { cleanup, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+ // @vitest-environment jsdom
 
-import Carrito from './Carrito.jsx'
+import React from 'react';
+import '@testing-library/jest-dom/vitest';
+
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor
+} from '@testing-library/react';
+
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi
+} from 'vitest';
+
+import Carrito from './Carrito.jsx';
 
 // ========================================
-// 1. CONFIGURACIÓN Y MOCKS
+// 1. PRODUCTOS SIMULADOS PARA LAS PRUEBAS
 // ========================================
 
 const mockProductos = [
   {
     id: 1,
     nombre: 'Pan amasado',
-    precio: '$1.500', // String con formato
+    precio: '$1.500',
     cantidad: 2,
-    img: 'pan.jpg',
+    img: 'pan.jpg'
   },
   {
     id: 2,
     nombre: 'Leche entera',
-    precio: 1000, // Número directo
+    precio: 1000,
     cantidad: 1,
-    img: 'leche.jpg',
+    img: 'leche.jpg'
   },
   {
     id: 3,
     nombre: 'Regalo promocional',
-    precio: 'Gratis', // String inválido matemáticamente (forzará el fallback a || 0)
+    precio: 'Gratis',
     cantidad: 1,
-    img: 'regalo.jpg',
-  },
-]
+    img: 'regalo.jpg'
+  }
+];
 
+// ========================================
+// 2. FUNCIONES DE APOYO
+// ========================================
+
+// Muestra el carrito dentro de React Router.
 function mostrar() {
+  const user = userEvent.setup();
+
   render(
     <MemoryRouter>
       <Carrito />
     </MemoryRouter>
-  )
-  return {
-    user: userEvent.setup(),
-  }
+  );
+
+  return { user };
 }
 
+// Lee los productos guardados en localStorage.
+function obtenerCarrito() {
+  return JSON.parse(localStorage.getItem('carritoMarket'));
+}
+
+// Simula una respuesta exitosa del backend.
+function respuestaExitosa() {
+  return {
+    ok: true,
+    status: 200,
+    json: async () => ({}),
+    text: async () => ''
+  };
+}
+
+// ========================================
+// 3. CONFIGURACIÓN ANTES Y DESPUÉS
+// ========================================
+
 beforeEach(() => {
-  localStorage.clear()
-  vi.spyOn(window, 'alert').mockImplementation(() => {})
-})
+
+  // Comenzamos cada prueba sin información previa.
+  localStorage.clear();
+
+  // Simulamos las alertas del navegador.
+  vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+  // Evitamos mostrar errores simulados en consola.
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+
+});
 
 afterEach(() => {
-  cleanup()
-  vi.restoreAllMocks()
-})
+
+  // Desmontamos los componentes.
+  cleanup();
+
+  // Restauramos fetch y otras funciones globales.
+  vi.unstubAllGlobals();
+
+  // Restauramos los mocks.
+  vi.restoreAllMocks();
+
+  // Limpiamos localStorage.
+  localStorage.clear();
+
+});
 
 // ========================================
-// 2. PRUEBAS DE CARRITO VACÍO
+// 4. PRUEBAS UNITARIAS DEL CARRITO
 // ========================================
 
-describe('Pruebas unitarias para Carrito de Compras', () => {
-  test('renderiza correctamente el carrito vacío', () => {
-    mostrar()
+describe('Pruebas unitarias del Carrito de Compras', () => {
 
-    expect(screen.getByText('Tu Carrito de Compras')).toBeInTheDocument()
-    expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument()
-    
-    // CORRECCIÓN: Hay dos '$0' en pantalla (Subtotal y Total)
-    const montosCero = screen.getAllByText('$0')
-    expect(montosCero).toHaveLength(2)
-  })
+  // ----------------------------------------
+  // PRUEBA 1: CARRITO VACÍO
+  // ----------------------------------------
 
-  test('finalizar compra con carrito vacío muestra alerta de error y vaciar carrito no hace nada', async () => {
-    const { user } = mostrar()
+  test('muestra correctamente el carrito vacío', () => {
 
-    // Intentar finalizar compra
-    await user.click(screen.getByRole('button', { name: /Finalizar Venta/i }))
+    mostrar();
+
+    expect(
+      screen.getByText('Tu Carrito de Compras')
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('Tu carrito está vacío')
+    ).toBeInTheDocument();
+
+    // Deben mostrarse los montos de subtotal y total.
+    const montosCero = screen.getAllByText('$0');
+
+    expect(montosCero).toHaveLength(2);
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 2: FINALIZAR SIN PRODUCTOS
+  // ----------------------------------------
+
+  test('muestra una alerta al intentar comprar con carrito vacío', async () => {
+
+    const { user } = mostrar();
+
+    // Intentamos finalizar una venta sin productos.
+    await user.click(
+      screen.getByRole('button', {
+        name: /Finalizar Venta/i
+      })
+    );
+
     expect(window.alert).toHaveBeenCalledWith(
       'Tu carrito está vacío. Agrega productos antes de finalizar la venta.'
-    )
+    );
 
-    // Intentar vaciar carrito (dispara la condición if (carrito.length === 0) return)
-    const btnVaciar = screen.getByRole('button', { name: /Vaciar Carrito/i })
-    await user.click(btnVaciar)
-    
-    expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument()
-  })
+    // Intentamos vaciar un carrito que ya está vacío.
+    await user.click(
+      screen.getByRole('button', {
+        name: /Vaciar Carrito/i
+      })
+    );
 
-  // ========================================
-  // 3. PRUEBAS CON PRODUCTOS Y CÁLCULOS
-  // ========================================
+    expect(
+      screen.getByText('Tu carrito está vacío')
+    ).toBeInTheDocument();
 
-  test('renderiza productos desde localStorage y calcula el total correctamente', () => {
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    mostrar()
+    expect(obtenerCarrito()).toEqual([]);
 
-    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
-    expect(screen.getByText('Leche entera')).toBeInTheDocument()
-    expect(screen.getByText('Regalo promocional')).toBeInTheDocument()
+  });
 
-    // Cálculos: (1500 * 2) + (1000 * 1) + (0 * 1) = 4000
-    // Hay 1 subtotal y 1 total con el valor 4000, además de los subtotales individuales
-    const montosTotales = screen.getAllByText('$4.000')
-    expect(montosTotales.length).toBeGreaterThan(0)
-  })
+  // ----------------------------------------
+  // PRUEBA 3: MOSTRAR PRODUCTOS Y TOTAL
+  // ----------------------------------------
 
-  // ========================================
-  // 4. CONTROLES DE UNIDADES (+ Y -)
-  // ========================================
+  test('muestra productos y calcula correctamente el total', () => {
 
-  test('aumenta la cantidad de un producto y actualiza localStorage y evento global', async () => {
-    localStorage.setItem('carritoMarket', JSON.stringify([mockProductos[1]])) // Leche (cantidad 1)
-    
-    const eventoActualizadoSpy = vi.fn()
-    window.addEventListener('carritoActualizado', eventoActualizadoSpy)
+    // Guardamos productos de prueba.
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
 
-    const { user } = mostrar()
+    mostrar();
 
-    const btnAumentar = screen.getByLabelText('Sumar una unidad')
-    await user.click(btnAumentar)
+    // Comprobamos que aparezcan los productos.
+    expect(
+      screen.getByText('Pan amasado')
+    ).toBeInTheDocument();
 
-    // La cantidad en pantalla debería subir a 2
-    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(
+      screen.getByText('Leche entera')
+    ).toBeInTheDocument();
 
-    // El precio de 1000 sube a 2000
-    expect(screen.getAllByText('$2.000').length).toBeGreaterThan(0)
+    expect(
+      screen.getByText('Regalo promocional')
+    ).toBeInTheDocument();
 
-    // Verifica que el localStorage se guardó
-    const carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado[0].cantidad).toBe(2)
+    // Pan: 1500 x 2 = 3000
+    // Leche: 1000 x 1 = 1000
+    // Regalo: 0
+    // Total esperado: 4000
 
-    // El useEffect dispara el evento
-    expect(eventoActualizadoSpy).toHaveBeenCalled()
-    window.removeEventListener('carritoActualizado', eventoActualizadoSpy)
-  })
+    const montos = screen.getAllByText('$4.000');
 
-  test('disminuye la cantidad de un producto, y lo elimina si llega a 0', async () => {
-    localStorage.setItem('carritoMarket', JSON.stringify([mockProductos[0], mockProductos[1]])) 
-    // Pan (cant: 2), Leche (cant: 1)
+    expect(montos.length).toBeGreaterThan(0);
 
-    const { user } = mostrar()
+  });
 
-    const botonesRestar = screen.getAllByLabelText('Restar una unidad')
-    
-    // Restar Pan (botón índice 0) -> Baja de 2 a 1
-    await user.click(botonesRestar[0])
-    
-    let carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado[0].cantidad).toBe(1)
-    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
+  // ----------------------------------------
+  // PRUEBA 4: AUMENTAR CANTIDAD
+  // ----------------------------------------
 
-    // Restar Leche (botón índice 1) -> Baja de 1 a 0 (debe desaparecer)
-    await user.click(botonesRestar[1])
+  test('aumenta la cantidad y actualiza localStorage', async () => {
 
-    carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado.length).toBe(1) // Solo queda el Pan
-    expect(screen.queryByText('Leche entera')).not.toBeInTheDocument()
-  })
+    // Agregamos una leche con cantidad 1.
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify([mockProductos[1]])
+    );
 
-  // ========================================
-  // 5. ACCIONES GLOBALES: QUITAR, VACIAR Y FINALIZAR
-  // ========================================
+    const eventoSpy = vi.fn();
 
-  test('elimina un producto por completo al presionar "Quitar todo"', async () => {
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    const { user } = mostrar()
+    window.addEventListener(
+      'carritoActualizado',
+      eventoSpy
+    );
 
-    const botonesQuitarTodo = screen.getAllByRole('button', { name: /Quitar todo/i })
-    
-    // Eliminamos el Pan (índice 0)
-    await user.click(botonesQuitarTodo[0])
+    try {
 
-    expect(screen.queryByText('Pan amasado')).not.toBeInTheDocument()
-    const carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado.length).toBe(2) // Quedan 2 productos
-  })
+      const { user } = mostrar();
 
-  test('vacía todo el carrito usando el botón "Vaciar Carrito"', async () => {
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    const { user } = mostrar()
+      // Aumentamos una unidad.
+      await user.click(
+        screen.getByLabelText('Sumar una unidad')
+      );
 
-    const btnVaciar = screen.getByRole('button', { name: /Vaciar Carrito/i })
-    await user.click(btnVaciar)
+      // La cantidad ahora debe ser 2.
+      expect(
+        screen.getByText('2')
+      ).toBeInTheDocument();
 
-    expect(screen.getByText('Tu carrito está vacío')).toBeInTheDocument()
-    const carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado).toEqual([])
-  })
+      // El total debe cambiar a $2000.
+      expect(
+        screen.getAllByText('$2.000').length
+      ).toBeGreaterThan(0);
 
-  test('finalizar compra sin sesión iniciada pide iniciar sesión y no llama al backend', async () => {
-    const fetchMock = vi.fn()
-    vi.stubGlobal('fetch', fetchMock)
+      // Verificamos el almacenamiento.
+      await waitFor(() => {
+        expect(obtenerCarrito()[0].cantidad).toBe(2);
+      });
 
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    const { user } = mostrar()
+      // Verificamos que se avise al Navbar.
+      expect(eventoSpy).toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: /Finalizar Venta/i }))
+    } finally {
 
-    expect(window.alert).toHaveBeenCalledWith('Debes iniciar sesión para finalizar la compra.')
-    expect(fetchMock).not.toHaveBeenCalled()
+      window.removeEventListener(
+        'carritoActualizado',
+        eventoSpy
+      );
 
-    // El carrito se mantiene intacto
-    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
-    vi.unstubAllGlobals()
-  })
+    }
 
-  test('finaliza la compra exitosamente contra el backend y vacía el carrito', async () => {
-    const fetchMock = vi.fn(() =>
-      Promise.resolve({ ok: true, json: async () => ({}), text: async () => '' })
-    )
-    vi.stubGlobal('fetch', fetchMock)
+  });
 
-    localStorage.setItem('usuarioActivo', JSON.stringify({ id: 7, nombre: 'Test' }))
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    const { user } = mostrar()
+  // ----------------------------------------
+  // PRUEBA 5: DISMINUIR CANTIDAD
+  // ----------------------------------------
 
-    const btnFinalizar = screen.getByRole('button', { name: /Finalizar Venta/i })
-    await user.click(btnFinalizar)
+  test('disminuye cantidades y elimina productos al llegar a cero', async () => {
 
-    // El carrito debe quedar limpio en pantalla y en localStorage
-    expect(await screen.findByText('Tu carrito está vacío')).toBeInTheDocument()
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify([
+        mockProductos[0],
+        mockProductos[1]
+      ])
+    );
+
+    const { user } = mostrar();
+
+    // Buscamos los botones para restar unidades.
+    const botonesRestar = screen.getAllByLabelText(
+      'Restar una unidad'
+    );
+
+    // Restamos una unidad al pan.
+    await user.click(botonesRestar[0]);
+
+    await waitFor(() => {
+      expect(obtenerCarrito()[0].cantidad).toBe(1);
+    });
+
+    expect(
+      screen.getByText('Pan amasado')
+    ).toBeInTheDocument();
+
+    // Restamos una unidad a la leche.
+    // Como tenía una unidad, debe desaparecer.
+    await user.click(
+      screen.getAllByLabelText('Restar una unidad')[1]
+    );
+
+    await waitFor(() => {
+      expect(obtenerCarrito()).toHaveLength(1);
+    });
+
+    expect(
+      screen.queryByText('Leche entera')
+    ).not.toBeInTheDocument();
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 6: QUITAR PRODUCTO COMPLETO
+  // ----------------------------------------
+
+  test('elimina un producto con el botón Quitar todo', async () => {
+
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
+
+    const { user } = mostrar();
+
+    const botonesQuitar = screen.getAllByRole(
+      'button',
+      { name: /Quitar todo/i }
+    );
+
+    // Eliminamos el primer producto.
+    await user.click(botonesQuitar[0]);
+
+    expect(
+      screen.queryByText('Pan amasado')
+    ).not.toBeInTheDocument();
+
+    await waitFor(() => {
+      const carrito = obtenerCarrito();
+
+      expect(carrito).toHaveLength(2);
+
+      expect(
+        carrito.some((producto) => producto.id === 1)
+      ).toBe(false);
+    });
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 7: VACIAR CARRITO COMPLETO
+  // ----------------------------------------
+
+  test('vacía completamente el carrito', async () => {
+
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
+
+    const { user } = mostrar();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Vaciar Carrito/i
+      })
+    );
+
+    expect(
+      screen.getByText('Tu carrito está vacío')
+    ).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(obtenerCarrito()).toEqual([]);
+    });
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 8: COMPRA SIN SESIÓN
+  // ----------------------------------------
+
+  test('impide finalizar compra sin iniciar sesión', async () => {
+
+    // Simulamos el backend.
+    const fetchMock = vi.fn();
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    // Agregamos productos, pero no usuario.
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
+
+    const { user } = mostrar();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Finalizar Venta/i
+      })
+    );
 
     expect(window.alert).toHaveBeenCalledWith(
+      'Debes iniciar sesión para finalizar la compra.'
+    );
+
+    // No debe consultar el backend.
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    // Los productos deben mantenerse.
+    expect(
+      screen.getByText('Pan amasado')
+    ).toBeInTheDocument();
+
+    expect(obtenerCarrito()).toHaveLength(3);
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 9: COMPRA EXITOSA
+  // ----------------------------------------
+
+  test('finaliza la compra y vacía el carrito', async () => {
+
+    const fetchMock = vi.fn()
+      .mockResolvedValue(respuestaExitosa());
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    // Simulamos un usuario con sesión iniciada.
+    localStorage.setItem(
+      'usuarioActivo',
+      JSON.stringify({
+        id: 7,
+        nombre: 'Cliente Prueba'
+      })
+    );
+
+    // Guardamos productos.
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
+
+    const { user } = mostrar();
+
+    await user.click(
+      screen.getByRole('button', {
+        name: /Finalizar Venta/i
+      })
+    );
+
+    // Esperamos la respuesta exitosa.
+    expect(
+      await screen.findByText('Tu carrito está vacío')
+    ).toBeInTheDocument();
+
+    // Comprobamos el mensaje de éxito.
+    expect(window.alert).toHaveBeenCalledWith(
       '¡Compra realizada con éxito! Gracias por preferir Market De La Esquina.'
-    )
-    const carritoGuardado = JSON.parse(localStorage.getItem('carritoMarket'))
-    expect(carritoGuardado).toEqual([])
+    );
 
-    // Se llamó al checkout del usuario 7
-    const urls = fetchMock.mock.calls.map((llamada) => llamada[0])
-    expect(urls.some((url) => url.endsWith('/ventas/checkout/7'))).toBe(true)
-    vi.unstubAllGlobals()
-  })
+    // Verificamos que el carrito quedó vacío.
+    await waitFor(() => {
+      expect(obtenerCarrito()).toEqual([]);
+    });
 
-  test('si el backend rechaza la compra muestra el mensaje y conserva el carrito', async () => {
+    // Verificamos el endpoint de checkout.
+    const urls = fetchMock.mock.calls.map(
+      (llamada) => llamada[0]
+    );
+
+    expect(
+      urls.some((url) =>
+        url.endsWith('/ventas/checkout/7')
+      )
+    ).toBe(true);
+
+  });
+
+  // ----------------------------------------
+  // PRUEBA 10: ERROR DEL BACKEND
+  // ----------------------------------------
+
+  test('conserva el carrito si el backend rechaza la compra', async () => {
+
+    // Simulamos un backend que devuelve error de stock.
     const fetchMock = vi.fn((url) => {
+
       if (String(url).includes('/ventas/checkout/')) {
         return Promise.resolve({
           ok: false,
           status: 409,
-          text: async () => JSON.stringify({ mensaje: 'Stock insuficiente.' }),
-        })
+          text: async () => JSON.stringify({
+            mensaje: 'Stock insuficiente.'
+          })
+        });
       }
-      return Promise.resolve({ ok: true, json: async () => ({}), text: async () => '' })
-    })
-    vi.stubGlobal('fetch', fetchMock)
-    vi.spyOn(console, 'error').mockImplementation(() => {})
 
-    localStorage.setItem('usuarioActivo', JSON.stringify({ id: 7, nombre: 'Test' }))
-    localStorage.setItem('carritoMarket', JSON.stringify(mockProductos))
-    const { user } = mostrar()
+      return Promise.resolve(respuestaExitosa());
 
-    await user.click(screen.getByRole('button', { name: /Finalizar Venta/i }))
+    });
 
-    await vi.waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Stock insuficiente.')
-    })
-    expect(screen.getByText('Pan amasado')).toBeInTheDocument()
-    vi.unstubAllGlobals()
-  })
-})
+    vi.stubGlobal('fetch', fetchMock);
+
+    // Simulamos sesión iniciada.
+    localStorage.setItem(
+      'usuarioActivo',
+      JSON.stringify({
+        id: 7,
+        nombre: 'Cliente Prueba'
+      })
+    );
+
+    // Agregamos productos al carrito.
+    localStorage.setItem(
+      'carritoMarket',
+      JSON.stringify(mockProductos)
+    );
+
+    const { user } = mostrar();
+
+    // Intentamos comprar.
+    await user.click(
+      screen.getByRole('button', {
+        name: /Finalizar Venta/i
+      })
+    );
+
+    // El backend responde con stock insuficiente.
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith(
+        'Stock insuficiente.'
+      );
+    });
+
+    // Los productos deben seguir disponibles.
+    expect(
+      screen.getByText('Pan amasado')
+    ).toBeInTheDocument();
+
+    // Comprobamos que el carrito no cambió.
+    expect(obtenerCarrito()).toHaveLength(3);
+
+  });
+
+});

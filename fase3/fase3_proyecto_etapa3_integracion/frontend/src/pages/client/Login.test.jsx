@@ -1,252 +1,452 @@
 
-import { cleanup, render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+ // @vitest-environment jsdom
 
-import Login from './Login.jsx'
+import React from 'react';
+import { render, screen, cleanup, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
+import Login from './Login.jsx';
 
-// ========================================
-// 1. DATOS Y CONFIGURACIÓN DE PRUEBA
-// ========================================
+// Datos que simularemos recibir desde el backend.
+const usuarioBackend = {
+  idUsuario: 1,
+  nombreUsuario: 'Cliente Prueba',
+  correoUsuario: 'cliente@gmail.com',
+  tipoUsuario: 'CLIENTE',
+  token: 'token-de-prueba'
+};
 
-const usuarioBairon = {
-  nombre: 'bairon',
-  correo: 'bairon@gmail.com',
-  tipoUsuario: 'Cliente',
-  contrasena: '12345',
+// Simulamos una respuesta exitosa del backend.
+function respuestaExitosa() {
+  return {
+    ok: true,
+    json: async () => usuarioBackend
+  };
 }
 
-const etiquetas = {
-  correo: /^Correo electrónico/,
-  contrasena: /^Contraseña/,
+// Simulamos una respuesta de error del backend.
+function respuestaError(mensaje, status = 401) {
+  return {
+    ok: false,
+    status,
+    text: async () => JSON.stringify({ mensaje })
+  };
 }
 
-function mostrar() {
+// Mostramos el Login con React Router.
+function mostrarLogin() {
+  const user = userEvent.setup();
+
   render(
     <MemoryRouter initialEntries={['/login']}>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<h1>Página Principal (Home)</h1>} />
-        <Route path="/admin" element={<h1>Panel de Administración</h1>} />
+        <Route path="/" element={<h1>Página principal</h1>} />
       </Routes>
     </MemoryRouter>
-  )
+  );
 
-  return {
-    user: userEvent.setup(),
-  }
+  return user;
 }
 
-async function completar(user, { correo, contrasena }) {
-  if (correo !== undefined) {
-    const inputCorreo = screen.getByLabelText(etiquetas.correo)
-    await user.click(inputCorreo)
-    await user.clear(inputCorreo)
-    if (correo) await user.paste(correo)
-  }
-
-  if (contrasena !== undefined) {
-    const inputContrasena = screen.getByLabelText(etiquetas.contrasena)
-    await user.click(inputContrasena)
-    await user.clear(inputContrasena)
-    if (contrasena) await user.paste(contrasena)
-  }
+// Función para completar los campos del Login.
+async function completarLogin(user, correo = 'cliente@gmail.com', contrasena = '123456') {
+  await user.type(screen.getByLabelText('Correo electrónico'), correo);
+  await user.type(screen.getByLabelText('Contraseña'), contrasena);
 }
 
-async function enviar(user) {
-  await user.click(
-    screen.getByRole('button', {
-      name: /^Iniciar$/i,
-    })
-  )
+// Función para enviar el formulario.
+async function enviarLogin(user) {
+  await user.click(screen.getByRole('button', { name: 'Iniciar' }));
 }
 
-beforeEach(() => {
-  localStorage.clear()
-})
+describe('Pruebas unitarias del Login', () => {
 
-afterEach(() => {
-  cleanup()
-  vi.restoreAllMocks()
-})
+  beforeEach(() => {
+    // Cada prueba comienza sin una sesión guardada.
+    localStorage.clear();
 
-// ========================================
-// 2. PRUEBAS DE RENDERIZADO Y VALIDACIÓN
-// ========================================
+    // Simulamos fetch para no depender del backend real.
+    vi.stubGlobal('fetch', vi.fn());
 
-describe('Pruebas unitarias para Login del Minimarket', () => {
-  test('renderiza el formulario de login y muestra error al enviar campos vacíos', async () => {
-    const { user } = mostrar()
+    // Evitamos mostrar errores esperados en la consola.
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
 
-    expect(
-      screen.getByRole('heading', { name: /^Login$/i })
-    ).toBeInTheDocument()
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
 
-    await enviar(user)
+  // PRUEBA 1
+  test('muestra correctamente el formulario de Login', () => {
+    mostrarLogin();
 
-    expect(
-      await screen.findByText('Por favor completa ambos campos.')
-    ).toBeInTheDocument()
-  })
+    expect(screen.getByRole('heading', { name: 'Login' })).toBeTruthy();
+    expect(screen.getByLabelText('Correo electrónico')).toBeTruthy();
+    expect(screen.getByLabelText('Contraseña')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Iniciar' })).toBeTruthy();
+  });
 
-  test('limpia el mensaje de error cuando Bairon escribe en correo o contraseña', async () => {
-    const { user } = mostrar()
+  // PRUEBA 2
+  test('muestra error cuando ambos campos están vacíos', async () => {
+    const user = mostrarLogin();
 
-    await enviar(user)
-    expect(screen.getByText('Por favor completa ambos campos.')).toBeInTheDocument()
+    await enviarLogin(user);
 
-    await user.type(screen.getByLabelText(etiquetas.correo), 'b')
-    expect(screen.queryByText('Por favor completa ambos campos.')).not.toBeInTheDocument()
+    expect(screen.getByRole('alert').textContent)
+      .toContain('Por favor completa ambos campos.');
 
-    await enviar(user)
-    expect(screen.getByText('Por favor completa ambos campos.')).toBeInTheDocument()
+    expect(fetch).not.toHaveBeenCalled();
+  });
 
-    await user.type(screen.getByLabelText(etiquetas.contrasena), '1')
-    expect(screen.queryByText('Por favor completa ambos campos.')).not.toBeInTheDocument()
-  })
+  // PRUEBA 3
+  test('muestra error cuando falta el correo', async () => {
+    const user = mostrarLogin();
 
+    await user.type(screen.getByLabelText('Contraseña'), '123456');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('Por favor completa ambos campos.');
+  });
+
+  // PRUEBA 4
+  test('muestra error cuando falta la contraseña', async () => {
+    const user = mostrarLogin();
+
+    await user.type(screen.getByLabelText('Correo electrónico'), 'cliente@gmail.com');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('Por favor completa ambos campos.');
+  });
+
+  // PRUEBA 5
+  test('rechaza correos de más de 100 caracteres', async () => {
+    const user = mostrarLogin();
+
+    await completarLogin(user, 'a'.repeat(101) + '@gmail.com', '123456');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('El correo no puede superar los 100 caracteres.');
+
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  // PRUEBA 6
+  test('rechaza un dominio de correo no permitido', async () => {
+    const user = mostrarLogin();
+
+    await completarLogin(user, 'cliente@hotmail.com', '123456');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('El correo debe terminar en');
+
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  // PRUEBA 7
+  test('rechaza un correo sin nombre antes del arroba', async () => {
+    const user = mostrarLogin();
+
+    await completarLogin(user, '@gmail.com', '123456');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('El correo debe terminar en');
+  });
+
+  // PRUEBA 8
+  test('rechaza contraseñas con menos de 4 caracteres', async () => {
+    const user = mostrarLogin();
+
+    await completarLogin(user, 'cliente@gmail.com', '123');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('La contraseña debe tener entre 4 y 10 caracteres.');
+  });
+
+  // PRUEBA 9
+  test('rechaza contraseñas con más de 10 caracteres', async () => {
+    const user = mostrarLogin();
+
+    await completarLogin(user, 'cliente@gmail.com', '12345678901');
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert').textContent)
+      .toContain('La contraseña debe tener entre 4 y 10 caracteres.');
+  });
+
+  // PRUEBAS 10, 11, 12 y 13
   test.each([
-    [
-      `${'a'.repeat(92)}@gmail.com`,
-      '12345',
-      'El correo no puede superar los 100 caracteres.',
-    ],
-    [
-      'bairon@hotmail.com',
-      '12345',
-      'El correo debe terminar en @duoc.cl, @profesor.duoc.cl o @gmail.com.',
-    ],
-    [
-      'bairon@gmail.com',
-      '123',
-      'La contraseña debe tener entre 4 y 10 caracteres.',
-    ],
-    [
-      'bairon@gmail.com',
-      '12345678901',
-      'La contraseña debe tener entre 4 y 10 caracteres.',
-    ],
-  ])(
-    'rechaza login con formato inválido e informa el error correspondiente',
-    async (correo, contrasena, mensajeEsperado) => {
-      const { user } = mostrar()
+    'duoc.cl',
+    'duocuc.cl',
+    'profesor.duoc.cl',
+    'gmail.com'
+  ])('permite iniciar sesión con dominio %s', async (dominio) => {
+    const user = mostrarLogin();
 
-      await completar(user, { correo, contrasena })
-      await enviar(user)
+    fetch.mockResolvedValue(respuestaExitosa());
 
-      expect(await screen.findByText(mensajeEsperado)).toBeInTheDocument()
+    await completarLogin(user, `cliente@${dominio}`, '123456');
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('alert').textContent)
+        .toContain('¡Bienvenido! Iniciando sesión...');
+    });
+  });
+
+  // PRUEBA 14
+  test('envía correctamente el correo y la contraseña al backend', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user, 'cliente@gmail.com', '123456');
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/login'),
+        expect.objectContaining({
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            correoUsuario: 'cliente@gmail.com',
+            contrasenaUsuario: '123456'
+          })
+        })
+      );
+    });
+  });
+
+  // PRUEBA 15
+  test('convierte el correo a minúsculas antes de enviarlo', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user, 'CLIENTE@GMAIL.COM', '123456');
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      const opciones = fetch.mock.calls[0][1];
+      const datosEnviados = JSON.parse(opciones.body);
+
+      expect(datosEnviados.correoUsuario).toBe('cliente@gmail.com');
+    });
+  });
+
+  // PRUEBA 16
+  test('elimina espacios alrededor del correo y contraseña', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user, '  cliente@gmail.com  ', '  123456  ');
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      const datosEnviados = JSON.parse(fetch.mock.calls[0][1].body);
+
+      expect(datosEnviados.correoUsuario).toBe('cliente@gmail.com');
+      expect(datosEnviados.contrasenaUsuario).toBe('123456');
+    });
+  });
+
+  // PRUEBA 17
+  test('guarda el token al iniciar sesión correctamente', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user);
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      expect(localStorage.getItem('token')).toBe('token-de-prueba');
+    });
+  });
+
+  // PRUEBA 18
+  test('guarda correctamente los datos del usuario activo', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user);
+    await enviarLogin(user);
+
+    await waitFor(() => {
+      const usuario = JSON.parse(localStorage.getItem('usuarioActivo'));
+
+      expect(usuario.id).toBe(1);
+      expect(usuario.nombre).toBe('Cliente Prueba');
+      expect(usuario.correo).toBe('cliente@gmail.com');
+      expect(usuario.tipoUsuario).toBe('CLIENTE');
+      expect(usuario.inicial).toBe('C');
+    });
+  });
+
+  // PRUEBA 19
+  test('muestra mensaje de bienvenida después de iniciar sesión', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user);
+    await enviarLogin(user);
+
+    expect(await screen.findByText('¡Bienvenido! Iniciando sesión...'))
+      .toBeTruthy();
+  });
+
+  // PRUEBA 20
+  test('emite el evento sesionActualizada', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    const escucharEvento = vi.fn();
+    window.addEventListener('sesionActualizada', escucharEvento);
+
+    try {
+      await completarLogin(user);
+      await enviarLogin(user);
+
+      await waitFor(() => {
+        expect(escucharEvento).toHaveBeenCalledTimes(1);
+      });
+    } finally {
+      window.removeEventListener('sesionActualizada', escucharEvento);
     }
-  )
+  });
 
-  // ========================================
-  // 3. VERIFICACIÓN DE CREDENCIALES
-  // ========================================
+  // PRUEBA 21
+  test('muestra error cuando las credenciales son incorrectas', async () => {
+    const user = mostrarLogin();
 
-  test('muestra error si el correo de Bairon no está registrado en localStorage', async () => {
-    const { user } = mostrar()
+    fetch.mockResolvedValue(
+      respuestaError('Correo o contraseña incorrectos.')
+    );
 
-    await completar(user, {
-      correo: 'bairon@gmail.com',
-      contrasena: '12345',
-    })
-    await enviar(user)
+    await completarLogin(user);
+    await enviarLogin(user);
 
-    expect(
-      await screen.findByText(
-        'Este correo no está registrado. Por favor regístrate primero.'
-      )
-    ).toBeInTheDocument()
-  })
+    expect(await screen.findByText('Correo o contraseña incorrectos.'))
+      .toBeTruthy();
 
-  test('muestra error si la contraseña de Bairon es incorrecta', async () => {
-    localStorage.setItem(
-      'usuariosRegistrados',
-      JSON.stringify([usuarioBairon])
-    )
+    expect(localStorage.getItem('token')).toBeNull();
+  });
 
-    const { user } = mostrar()
+  // PRUEBA 22
+  test('muestra un error del backend enviado como texto plano', async () => {
+    const user = mostrarLogin();
 
-    await completar(user, {
-      correo: 'bairon@gmail.com',
-      contrasena: '99999', // 5 caracteres: cumple formato y gatilla la validación de credenciales
-    })
-    await enviar(user)
+    fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      text: async () => 'Error interno del servidor'
+    });
 
-    expect(
-      await screen.findByText('Contraseña incorrecta. Inténtalo nuevamente.')
-    ).toBeInTheDocument()
-  })
+    await completarLogin(user);
+    await enviarLogin(user);
 
-  // ========================================
-  // 4. INICIO DE SESIÓN EXITOSO Y NAVEGACIÓN
-  // ========================================
+    expect(await screen.findByText('Error interno del servidor'))
+      .toBeTruthy();
+  });
 
-  test.each(['duoc.cl', 'duocuc.cl', 'profesor.duoc.cl', 'gmail.com'])(
-    'permite iniciar sesión a Bairon con el dominio @%s',
-    async (dominio) => {
-      const correoValido = `bairon@${dominio}`
-      localStorage.setItem(
-        'usuariosRegistrados',
-        JSON.stringify([{ ...usuarioBairon, correo: correoValido }])
-      )
+  // PRUEBA 23
+  test('muestra mensaje por defecto si el backend no entrega un mensaje', async () => {
+    const user = mostrarLogin();
 
-      const { user } = mostrar()
+    fetch.mockResolvedValue(respuestaError(''));
 
-      await completar(user, {
-        correo: correoValido,
-        contrasena: '12345',
-      })
-      await enviar(user)
+    await completarLogin(user);
+    await enviarLogin(user);
 
-      expect(
-        await screen.findByText('¡Bienvenido! Iniciando sesión...')
-      ).toBeInTheDocument()
-    }
-  )
+    expect(await screen.findByText('Correo o contraseña incorrectos.'))
+      .toBeTruthy();
+  });
 
-  test('inicia sesión correctamente, guarda datos en localStorage, dispara evento y redirige a /', async () => {
-    localStorage.setItem(
-      'usuariosRegistrados',
-      JSON.stringify([usuarioBairon])
-    )
+  // PRUEBA 24
+  test('muestra error cuando no se puede conectar al servidor', async () => {
+    const user = mostrarLogin();
 
-    const eventoSesionSpy = vi.fn()
-    window.addEventListener('sesionActualizada', eventoSesionSpy)
+    fetch.mockRejectedValue(new Error('Sin conexión'));
 
-    const { user } = mostrar()
+    await completarLogin(user);
+    await enviarLogin(user);
 
-    await completar(user, {
-      correo: 'BAIRON@GMAIL.COM',
-      contrasena: '12345',
-    })
-    await enviar(user)
+    expect(await screen.findByText(
+      'Error al conectar con el servidor. Revisa que el backend esté corriendo.'
+    )).toBeTruthy();
+  });
 
-    expect(
-      await screen.findByText('¡Bienvenido! Iniciando sesión...')
-    ).toBeInTheDocument()
+  // PRUEBA 25
+  test('limpia el mensaje de error al modificar el correo', async () => {
+    const user = mostrarLogin();
 
-    const usuarioActivo = JSON.parse(
-      localStorage.getItem('usuarioActivo') || '{}'
-    )
-    expect(usuarioActivo).toEqual({
-      nombre: 'bairon',
-      correo: 'bairon@gmail.com',
-      tipoUsuario: 'Cliente',
-      inicial: 'B',
-      avatar: 'https://i.pravatar.cc/100?img=68',
-    })
+    await enviarLogin(user);
 
-    expect(eventoSesionSpy).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('alert')).toBeTruthy();
 
-    expect(
-      await screen.findByRole(
-        'heading',
-        { name: 'Página Principal (Home)' },
-        { timeout: 2000 }
-      )
-    ).toBeInTheDocument()
+    await user.type(screen.getByLabelText('Correo electrónico'), 'a');
 
-    window.removeEventListener('sesionActualizada', eventoSesionSpy)
-  })
-})
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  // PRUEBA 26
+  test('limpia el mensaje de error al modificar la contraseña', async () => {
+    const user = mostrarLogin();
+
+    await enviarLogin(user);
+
+    expect(screen.getByRole('alert')).toBeTruthy();
+
+    await user.type(screen.getByLabelText('Contraseña'), '1');
+
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  // PRUEBA 27
+  test('deshabilita el botón mientras se procesa el Login', async () => {
+    const user = mostrarLogin();
+
+    // Dejamos pendiente la respuesta del backend.
+    fetch.mockImplementation(() => new Promise(() => {}));
+
+    await completarLogin(user);
+    await enviarLogin(user);
+
+    const boton = screen.getByRole('button', { name: 'Ingresando...' });
+
+    expect(boton.disabled).toBe(true);
+  });
+
+  // PRUEBA 28
+  test('redirige al inicio después de un Login exitoso', async () => {
+    const user = mostrarLogin();
+
+    fetch.mockResolvedValue(respuestaExitosa());
+
+    await completarLogin(user);
+    await enviarLogin(user);
+
+    // Login.jsx realiza la redirección después de 800 ms.
+    expect(await screen.findByText(
+      'Página principal',
+      {},
+      { timeout: 2000 }
+    )).toBeTruthy();
+  });
+
+});

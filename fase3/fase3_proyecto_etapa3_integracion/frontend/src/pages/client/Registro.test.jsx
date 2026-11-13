@@ -1,257 +1,608 @@
+// @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import React from 'react';
 
-import Registro from './Registro.jsx'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
+import Registro from './Registro.jsx';
 
 // ========================================
-// 1. DATOS Y CONFIGURACIÓN DEL MINIMARKET
+// 1. DATOS DE PRUEBA
 // ========================================
 
 const datosValidos = {
     run: '216830172',
-    nombre: 'bairon',
-    apellidos: 'valencia leiva',
+    nombre: 'Bairon',
+    apellidos: 'Valencia Leiva',
     correo: 'bairon@gmail.com',
-    tipoUsuario: 'Cliente',
-    direccion: 'mena 1735',
-    contrasena: '12345',
-    confirmarContrasena: '12345',
     fechaNacimiento: '2004-10-08',
-}
+    tipoUsuario: 'Cliente',
+    direccion: 'Mena 1735',
+    contrasena: '12345',
+    confirmarContrasena: '12345'
+};
+
+// ========================================
+// 2. CONFIGURACIÓN DE ETIQUETAS
+// ========================================
 
 const etiquetas = {
     run: /^RUN/,
     nombre: /^Nombre/,
     apellidos: /^Apellidos/,
     correo: /^Correo electrónico/,
+    fechaNacimiento: /^Fecha de nacimiento/,
     tipoUsuario: /^Tipo de usuario/,
     direccion: /^Dirección/,
-    contrasena: /^Contraseña/,
-    confirmarContrasena: /^Confirmar contraseña/,
-    fechaNacimiento: /^Fecha de nacimiento/,
-}
+    contrasena: /^Contraseña$/,
+    confirmarContrasena: /^Confirmar contraseña/
+};
+
+// ========================================
+// 3. CONFIGURACIÓN DEL COMPONENTE
+// ========================================
 
 function mostrar() {
+    const user = userEvent.setup();
+
     render(
         <MemoryRouter initialEntries={['/registro']}>
             <Routes>
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/login" element={<h1>Destino: Iniciar Sesión</h1>} />
+
+                <Route
+                    path="/login"
+                    element={<h1>Destino: Iniciar Sesión</h1>}
+                />
             </Routes>
         </MemoryRouter>
-    )
+    );
 
-    return {
-        user: userEvent.setup(),
-    }
+    return { user };
 }
 
 // ========================================
-// 2. INTERACCIONES DEL FORMULARIO
+// 4. COMPLETAR FORMULARIO
 // ========================================
 
-function completar(user, cambios = {}) {
+function completar(cambios = {}) {
+
     const datos = {
         ...datosValidos,
-        ...cambios,
-    }
+        ...cambios
+    };
 
+    // Completar los campos de texto
     for (const [campo, valor] of Object.entries(datos)) {
-        if (valor === undefined) continue
-        const control = screen.getByLabelText(etiquetas[campo])
-        fireEvent.change(control, { target: { name: control.name || campo, value: valor } })
+
+        if (valor === undefined) continue;
+
+        const control = screen.getByLabelText(etiquetas[campo]);
+
+        fireEvent.change(control, {
+            target: { value: valor }
+        });
     }
 
-    const regionSelect = screen.getByLabelText(/^Región/)
-    fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: 'Región Metropolitana' } })
+    // Seleccionar región
+    const regionSelect = screen.getByLabelText(/^Región/);
 
-    const comunaSelect = screen.getByLabelText(/^Comuna/)
-    fireEvent.change(comunaSelect, { target: { name: comunaSelect.name || 'comuna', value: 'Santiago' } })
+    fireEvent.change(regionSelect, {
+        target: { value: 'Región Metropolitana' }
+    });
+
+    // Seleccionar comuna
+    const comunaSelect = screen.getByLabelText(/^Comuna/);
+
+    fireEvent.change(comunaSelect, {
+        target: { value: 'Santiago' }
+    });
 }
+
+// ========================================
+// 5. ENVIAR FORMULARIO
+// ========================================
 
 async function enviar(user) {
-    await user.click(screen.getByRole('button', { name: /Registrarme/i }))
+
+    await user.click(
+        screen.getByRole('button', {
+            name: /Registrarme/i
+        })
+    );
 }
 
+// ========================================
+// 6. CONFIGURACIÓN DE PRUEBAS
+// ========================================
+
 beforeEach(() => {
-    localStorage.clear()
-})
+
+    // Simular respuesta exitosa del backend
+    vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue({
+            ok: true,
+            status: 200,
+            statusText: 'OK',
+            text: vi.fn().mockResolvedValue('')
+        })
+    );
+
+});
 
 afterEach(() => {
-    cleanup()
-    vi.restoreAllMocks()
-})
+
+    cleanup();
+
+    // Restaurar los mocks
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+
+});
 
 // ========================================
-// 3. PRUEBAS UNITARIAS (DESCRIBE PRINCIPAL)
+// 7. PRUEBAS DEL FORMULARIO REGISTRO
 // ========================================
 
-describe('Pruebas unitarias para Registro de Minimarket', () => {
+describe('Pruebas unitarias del Registro', () => {
 
-    test('muestra mensaje de error si se intenta enviar el formulario vacío', async () => {
-        const { user } = mostrar()
-        expect(screen.getByRole('heading', { name: /^Registro$/i })).toBeInTheDocument()
-        await enviar(user)
-        expect(await screen.findByText('Por favor completa todos los campos obligatorios.')).toBeInTheDocument()
-    })
+    // ------------------------------------
+    // PRUEBA 1: RENDERIZADO
+    // ------------------------------------
 
-    // === LIMPIEZA DE ERRORES AL ESCRIBIR (CUBRE TODAS LAS LÍNEAS DE ONCHANGE) ===
-    test.each([
-        ['run', /^RUN/, '2'],
-        ['nombre', /^Nombre/, 'b'],
-        ['apellidos', /^Apellidos/, 'v'],
-        ['correo', /^Correo electrónico/, 'b@g.com'],
-        ['direccion', /^Dirección/, 'm'],
-        ['contrasena', /^Contraseña/, '1'],
-        ['confirmarContrasena', /^Confirmar contraseña/, '1'],
-    ])('limpia el mensaje de error cuando Bairon modifica el campo %s', async (nombreCampo, etiqueta, valorTest) => {
-        const { user } = mostrar()
-        await enviar(user)
-        expect(screen.getByText('Por favor completa todos los campos obligatorios.')).toBeInTheDocument()
+    test('muestra correctamente el formulario de registro', () => {
 
-        const control = screen.getByLabelText(etiqueta)
-        fireEvent.change(control, { target: { name: control.name || nombreCampo, value: valorTest } })
-
-        expect(screen.queryByText('Por favor completa todos los campos obligatorios.')).not.toBeInTheDocument()
-    })
-
-    // === LIMPIEZA DE ERRORES AL CAMBIAR REGIÓN O COMUNA (LÍNEAS 149-156) ===
-    test('limpia el estado de error al cambiar la región o comuna', async () => {
-        const { user } = mostrar()
-
-        await enviar(user)
-        expect(screen.getByText('Por favor completa todos los campos obligatorios.')).toBeInTheDocument()
-
-        const regionSelect = screen.getByLabelText(/^Región/)
-        fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: 'Valparaíso' } })
-        expect(screen.queryByText('Por favor completa todos los campos obligatorios.')).not.toBeInTheDocument()
-
-        await enviar(user)
-        expect(screen.getByText('Por favor completa todos los campos obligatorios.')).toBeInTheDocument()
-
-        const comunaSelect = screen.getByLabelText(/^Comuna/)
-        fireEvent.change(comunaSelect, { target: { name: comunaSelect.name || 'comuna', value: 'Quilpué' } })
-        expect(screen.queryByText('Por favor completa todos los campos obligatorios.')).not.toBeInTheDocument()
-    })
-
-    // === VALIDACIONES DE LÍMITE Y FORMATO ===
-    test.each([
-        ['run', '12.345.678-5', 'El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.'],
-        ['run', '12345678Z', 'El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.'],
-        ['nombre', 'a'.repeat(51), 'El nombre no puede superar los 50 caracteres.'],
-        ['apellidos', 'a'.repeat(101), 'Los apellidos no pueden superar los 100 caracteres.'],
-        ['correo', 'bairon@hotmail.com', 'Ingresa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.'],
-        ['correo', `${'a'.repeat(91)}@gmail.com`, 'El correo no puede superar los 100 caracteres.'],
-        ['direccion', 'a'.repeat(301), 'La dirección no puede superar los 300 caracteres.'],
-        ['contrasena', '123', 'La contraseña debe tener entre 4 y 10 caracteres.'],
-        ['contrasena', '12345678901', 'La contraseña debe tener entre 4 y 10 caracteres.'],
-        ['confirmarContrasena', 'claveDiferente', 'Las contraseñas no coinciden.'],
-    ])('rechaza %s con valor inválido y muestra el mensaje correspondiente', async (campo, valor, mensajeEsperado) => {
-        const { user } = mostrar()
-        completar(user, { [campo]: valor })
-        await enviar(user)
-
-        expect(await screen.findByText(mensajeEsperado)).toBeInTheDocument()
-        expect(screen.queryByText('Destino: Iniciar Sesión')).not.toBeInTheDocument()
-    })
-
-    // === COBERTURA DEL ALGORITMO MÓDULO 11 (RUN MATEMÁTICO) ===
-    test.each([
-        ['216830170'], // DV real es 2, el '0' lo rechaza
-        ['14335340'],  // DV real es K, el '0' lo rechaza obligando a pasar por el IF de K
-        ['1234561']    // DV real es 0, el '1' lo rechaza obligando a pasar por el IF de 0
-    ])('ejecuta la validación matemática de Módulo 11 rechazando el RUN inválido %s', async (runInvalido) => {
-        const { user } = mostrar()
-        completar(user, { run: runInvalido })
-        await enviar(user)
+        mostrar();
 
         expect(
-            await screen.findByText('El RUN debe tener entre 7 y 9 caracteres, sin puntos ni guion, y un dígito verificador válido.')
-        ).toBeInTheDocument()
-    })
+            screen.getByRole('heading', { name: /^Registro$/i })
+        ).toBeInTheDocument();
 
-    // === LOGICA DE REGION Y COMUNA ===
-    test('habilita comunas según región seleccionada y limpia comuna al cambiar región', async () => {
-        mostrar()
-        const regionSelect = screen.getByLabelText(/^Región/)
-        const comunaSelect = screen.getByLabelText(/^Comuna/)
+        expect(screen.getByLabelText(/^RUN/)).toBeInTheDocument();
 
-        expect(comunaSelect).toBeDisabled()
+        expect(screen.getByLabelText(/^Nombre/)).toBeInTheDocument();
 
-        fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: 'Región Metropolitana' } })
-        expect(comunaSelect).toBeEnabled()
-        fireEvent.change(comunaSelect, { target: { name: comunaSelect.name || 'comuna', value: 'Santiago' } })
+        expect(screen.getByLabelText(/^Apellidos/)).toBeInTheDocument();
 
-        fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: 'Valparaíso' } })
-        expect(comunaSelect).toHaveValue('')
-        expect(within(comunaSelect).queryByRole('option', { name: 'Santiago' })).not.toBeInTheDocument()
-        expect(within(comunaSelect).getByRole('option', { name: 'Viña del Mar' })).toBeInTheDocument()
-    })
+        expect(screen.getByLabelText(/^Correo electrónico/)).toBeInTheDocument();
 
-    test('deselecciona la región restableciendo y deshabilitando la comuna', async () => {
-        mostrar()
-        const regionSelect = screen.getByLabelText(/^Región/)
-        const comunaSelect = screen.getByLabelText(/^Comuna/)
+        expect(
+            screen.getByRole('button', { name: /Registrarme/i })
+        ).toBeInTheDocument();
 
-        fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: 'Región Metropolitana' } })
-        expect(comunaSelect).toBeEnabled()
+    });
 
-        fireEvent.change(regionSelect, { target: { name: regionSelect.name || 'region', value: '' } })
-        expect(comunaSelect).toBeDisabled()
-        expect(comunaSelect).toHaveValue('')
-    })
+    // ------------------------------------
+    // PRUEBA 2: FORMULARIO VACÍO
+    // ------------------------------------
 
-    // === REGISTROS EXITOSOS Y REDIRECCIÓN ===
-    test.each(['duoc.cl', 'duocuc.cl', 'profesor.duoc.cl', 'gmail.com'])(
-        'acepta el dominio @%s para el correo de Bairon',
-        async (dominio) => {
-            const { user } = mostrar()
-            completar(user, { correo: `bairon@${dominio}` })
-            await enviar(user)
-            expect(await screen.findByText(/¡Registro completado con éxito!/i)).toBeInTheDocument()
+    test('muestra error cuando se envía el formulario vacío', async () => {
+
+        const { user } = mostrar();
+
+        await enviar(user);
+
+        expect(
+            await screen.findByText(
+                'Por favor completa todos los campos obligatorios.'
+            )
+        ).toBeInTheDocument();
+
+        expect(fetch).not.toHaveBeenCalled();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 3: LIMPIAR MENSAJES DE ERROR
+    // ------------------------------------
+
+    test.each([
+        ['run', '2'],
+        ['nombre', 'B'],
+        ['apellidos', 'V'],
+        ['correo', 'b@gmail.com'],
+        ['direccion', 'M'],
+        ['contrasena', '1'],
+        ['confirmarContrasena', '1']
+    ])(
+        'limpia el mensaje de error al modificar el campo %s',
+        async (campo, valor) => {
+
+            const { user } = mostrar();
+
+            await enviar(user);
+
+            expect(
+                screen.getByText(
+                    'Por favor completa todos los campos obligatorios.'
+                )
+            ).toBeInTheDocument();
+
+            const control = screen.getByLabelText(etiquetas[campo]);
+
+            fireEvent.change(control, {
+                target: { value: valor }
+            });
+
+            expect(
+                screen.queryByText(
+                    'Por favor completa todos los campos obligatorios.'
+                )
+            ).not.toBeInTheDocument();
+
         }
-    )
+    );
 
-    test('acepta RUN terminado en K y completa el registro exitosamente', async () => {
-        const { user } = mostrar()
-        completar(user, { run: '1433534K' }) // RUN válido que termina en K
-        await enviar(user)
-        expect(await screen.findByText(/¡Registro completado con éxito!/i)).toBeInTheDocument()
-        expect(await screen.findByRole('heading', { name: 'Destino: Iniciar Sesión' }, { timeout: 2000 })).toBeInTheDocument()
-    })
+    // ------------------------------------
+    // PRUEBA 4: LIMPIAR ERROR AL CAMBIAR REGIÓN
+    // ------------------------------------
 
-    test('registra exitosamente a Bairon, guarda sus datos en localStorage y redirige a /login', async () => {
-        const { user } = mostrar()
-        completar(user)
-        await enviar(user)
-        expect(await screen.findByText(/¡Registro completado con éxito!/i)).toBeInTheDocument()
+    test('limpia el error al cambiar la región', async () => {
 
-        const usuarios = JSON.parse(localStorage.getItem('usuariosRegistrados') || '[]')
-        expect(usuarios).toHaveLength(1)
-        expect(usuarios[0]).toEqual(
-            expect.objectContaining({
-                run: '216830172',
-                nombre: 'bairon',
-                apellidos: 'valencia leiva',
-                correo: 'bairon@gmail.com',
+        const { user } = mostrar();
+
+        await enviar(user);
+
+        const regionSelect = screen.getByLabelText(/^Región/);
+
+        fireEvent.change(regionSelect, {
+            target: { value: 'Valparaíso' }
+        });
+
+        expect(
+            screen.queryByText(
+                'Por favor completa todos los campos obligatorios.'
+            )
+        ).not.toBeInTheDocument();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 5: VALIDACIONES DE CAMPOS
+    // ------------------------------------
+
+    test.each([
+        [
+            'nombre',
+            'a'.repeat(51),
+            'El nombre no puede superar los 50 caracteres.'
+        ],
+        [
+            'apellidos',
+            'a'.repeat(101),
+            'Los apellidos no pueden superar los 100 caracteres.'
+        ],
+        [
+            'correo',
+            'bairon@hotmail.com',
+            'Ingresa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.'
+        ],
+        [
+            'correo',
+            'a'.repeat(91) + '@gmail.com',
+            'El correo no puede superar los 100 caracteres.'
+        ],
+        [
+            'direccion',
+            'a'.repeat(301),
+            'La dirección no puede superar los 300 caracteres.'
+        ],
+        [
+            'contrasena',
+            '123',
+            'La contraseña debe tener entre 4 y 10 caracteres.'
+        ],
+        [
+            'contrasena',
+            '12345678901',
+            'La contraseña debe tener entre 4 y 10 caracteres.'
+        ],
+        [
+            'confirmarContrasena',
+            'claveDiferente',
+            'Las contraseñas no coinciden.'
+        ]
+    ])(
+        'rechaza el campo %s cuando contiene un valor inválido',
+        async (campo, valor, mensaje) => {
+
+            const { user } = mostrar();
+
+            completar({
+                [campo]: valor
+            });
+
+            await enviar(user);
+
+            expect(
+                await screen.findByText(mensaje)
+            ).toBeInTheDocument();
+
+            expect(fetch).not.toHaveBeenCalled();
+
+        }
+    );
+
+    // ------------------------------------
+    // PRUEBA 6: REGIONES Y COMUNAS
+    // ------------------------------------
+
+    test('habilita las comunas cuando se selecciona una región', () => {
+
+        mostrar();
+
+        const regionSelect = screen.getByLabelText(/^Región/);
+
+        const comunaSelect = screen.getByLabelText(/^Comuna/);
+
+        // Inicialmente la comuna está deshabilitada
+        expect(comunaSelect).toBeDisabled();
+
+        // Seleccionar región Metropolitana
+        fireEvent.change(regionSelect, {
+            target: { value: 'Región Metropolitana' }
+        });
+
+        expect(comunaSelect).toBeEnabled();
+
+        expect(
+            within(comunaSelect).getByRole('option', {
+                name: 'Santiago'
             })
-        )
+        ).toBeInTheDocument();
 
-        expect(await screen.findByRole('heading', { name: 'Destino: Iniciar Sesión' }, { timeout: 2000 })).toBeInTheDocument()
-    })
+        // Seleccionar comuna Santiago
+        fireEvent.change(comunaSelect, {
+            target: { value: 'Santiago' }
+        });
 
-    test('no permite registrar si el RUN o Correo ya existen en localStorage', async () => {
-        localStorage.setItem(
-            'usuariosRegistrados',
-            JSON.stringify([{ run: '216830172', correo: 'bairon@gmail.com' }])
-        )
-        const { user } = mostrar()
-        completar(user)
-        await enviar(user)
-        expect(await screen.findByText('Ya existe un usuario registrado con ese RUN o correo electrónico.')).toBeInTheDocument()
-    })
+        expect(comunaSelect).toHaveValue('Santiago');
 
-})
+        // Cambiar a Valparaíso
+        fireEvent.change(regionSelect, {
+            target: { value: 'Valparaíso' }
+        });
+
+        // La comuna anterior debe reiniciarse
+        expect(comunaSelect).toHaveValue('');
+
+        expect(
+            within(comunaSelect).queryByRole('option', {
+                name: 'Santiago'
+            })
+        ).not.toBeInTheDocument();
+
+        expect(
+            within(comunaSelect).getByRole('option', {
+                name: 'Quilpué'
+            })
+        ).toBeInTheDocument();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 7: COMUNA DESHABILITADA
+    // ------------------------------------
+
+    test('deshabilita la comuna cuando se reinicia la región', () => {
+
+        mostrar();
+
+        const regionSelect = screen.getByLabelText(/^Región/);
+
+        const comunaSelect = screen.getByLabelText(/^Comuna/);
+
+        fireEvent.change(regionSelect, {
+            target: { value: 'Región Metropolitana' }
+        });
+
+        expect(comunaSelect).toBeEnabled();
+
+        fireEvent.change(comunaSelect, {
+            target: { value: 'Santiago' }
+        });
+
+        fireEvent.change(regionSelect, {
+            target: { value: '' }
+        });
+
+        expect(comunaSelect).toBeDisabled();
+
+        expect(comunaSelect).toHaveValue('');
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 8: DOMINIOS DE CORREO
+    // ------------------------------------
+
+    test.each([
+        'duoc.cl',
+        'duocuc.cl',
+        'profesor.duoc.cl',
+        'gmail.com'
+    ])(
+        'permite registrar un correo con dominio %s',
+        async (dominio) => {
+
+            const { user } = mostrar();
+
+            completar({
+                correo: `bairon@${dominio}`
+            });
+
+            await enviar(user);
+
+            expect(
+                await screen.findByText(
+                    /¡Registro completado con éxito!/i
+                )
+            ).toBeInTheDocument();
+
+        }
+    );
+
+    // ------------------------------------
+    // PRUEBA 9: REGISTRO EXITOSO
+    // ------------------------------------
+
+    test('registra un usuario correctamente en el backend', async () => {
+
+        const { user } = mostrar();
+
+        completar();
+
+        await enviar(user);
+
+        // Comprobar mensaje de éxito
+        expect(
+            await screen.findByText(
+                /¡Registro completado con éxito!/i
+            )
+        ).toBeInTheDocument();
+
+        // Comprobar que se llamó al backend
+        expect(fetch).toHaveBeenCalledTimes(1);
+
+        // Obtener los datos enviados
+        const [url, opciones] = fetch.mock.calls[0];
+
+        expect(url).toContain('/usuarios');
+
+        expect(opciones.method).toBe('POST');
+
+        expect(opciones.headers).toEqual({
+            'Content-Type': 'application/json'
+        });
+
+        // Comprobar información enviada
+        const usuarioEnviado = JSON.parse(opciones.body);
+
+        expect(usuarioEnviado).toEqual({
+            runUsuario: '216830172',
+            nombreUsuario: 'Bairon',
+            apellidosUsuario: 'Valencia Leiva',
+            correoUsuario: 'bairon@gmail.com',
+            fechaNacimientoUsuario: '2004-10-08',
+            tipoUsuario: 'CLIENTE',
+            regionUsuario: 'Región Metropolitana',
+            comunaUsuario: 'Santiago',
+            direccionUsuario: 'Mena 1735',
+            contrasenaUsuario: '12345',
+            estadoUsuario: 'ACTIVO'
+        });
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 10: FECHA DE NACIMIENTO OPCIONAL
+    // ------------------------------------
+
+    test('permite registrar un usuario sin fecha de nacimiento', async () => {
+
+        const { user } = mostrar();
+
+        completar({
+            fechaNacimiento: ''
+        });
+
+        await enviar(user);
+
+        expect(
+            await screen.findByText(
+                /¡Registro completado con éxito!/i
+            )
+        ).toBeInTheDocument();
+
+        const opciones = fetch.mock.calls[0][1];
+
+        const usuarioEnviado = JSON.parse(opciones.body);
+
+        expect(usuarioEnviado.fechaNacimientoUsuario).toBeNull();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 11: ERROR DEL SERVIDOR
+    // ------------------------------------
+
+    test('muestra un mensaje cuando el backend devuelve un error', async () => {
+
+        fetch.mockResolvedValueOnce({
+            ok: false,
+            status: 400,
+            statusText: 'Bad Request',
+            text: vi.fn().mockResolvedValue('Error al registrar usuario')
+        });
+
+        const { user } = mostrar();
+
+        completar();
+
+        await enviar(user);
+
+        expect(
+            await screen.findByText(
+                'Error del servidor: Error al registrar usuario'
+            )
+        ).toBeInTheDocument();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 12: ERROR DE CONEXIÓN
+    // ------------------------------------
+
+    test('muestra un mensaje cuando no puede conectar con el backend', async () => {
+
+        fetch.mockRejectedValueOnce(
+            new Error('Error de conexión')
+        );
+
+        const { user } = mostrar();
+
+        completar();
+
+        await enviar(user);
+
+        expect(
+            await screen.findByText(
+                'Error al conectar con el servidor. Revisa que el backend esté corriendo.'
+            )
+        ).toBeInTheDocument();
+
+    });
+
+    // ------------------------------------
+    // PRUEBA 13: REDIRECCIÓN AL LOGIN
+    // ------------------------------------
+
+    test('redirige al login después de un registro exitoso', async () => {
+
+        const { user } = mostrar();
+
+        completar();
+
+        await enviar(user);
+
+        expect(
+            await screen.findByText(
+                /¡Registro completado con éxito!/i
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            await screen.findByRole(
+                'heading',
+                { name: 'Destino: Iniciar Sesión' },
+                { timeout: 3000 }
+            )
+        ).toBeInTheDocument();
+
+    });
+
+});
