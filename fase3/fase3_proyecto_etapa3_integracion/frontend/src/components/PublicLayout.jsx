@@ -113,12 +113,24 @@ function PublicLayout() {
 
                   {menuAbierto && (
                     <div className="menu-desplegable-perfil">
-                      <div className="correo-usuario-menu fw-semibold">
+                      <div className="correo-usuario-menu fw-semibold mb-2 pb-2 border-bottom">
                         {usuario.correo}
                       </div>
+
+                      {/* Solo aparece si el usuario tiene el rol de ADMINISTRADOR */}
+                      {usuario.tipoUsuario === 'ADMINISTRADOR' && (
+                        <Link
+                          to="/admin"
+                          className="btn btn-sm btn-outline-primary w-100 mb-2"
+                          onClick={() => setMenuAbierto(false)}
+                        >
+                          ⚙️ Panel de Admin
+                        </Link>
+                      )}
+
                       <button
                         type="button"
-                        className="btn-cerrar-sesion"
+                        className="btn-cerrar-sesion w-100"
                         onClick={cerrarSesion}
                       >
                         Cerrar sesión

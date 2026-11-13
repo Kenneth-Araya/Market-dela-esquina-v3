@@ -109,10 +109,6 @@ function Login() {
 
   return (
     <main className="contenedor-login pt-5">
-      {/* Botón Admin en la esquina superior derecha */}
-      <Link to="/admin" className="admin-link">
-        Admin
-      </Link>
 
       <section id="seccion-login" className="w-100">
         <div className="container">

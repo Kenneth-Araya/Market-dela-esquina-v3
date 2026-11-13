@@ -1,58 +1,186 @@
 /* =========================================
-   TARJETAS DE ESTADÍSTICAS (KPIs)
-   ========================================= */
+   ESTILOS GENERALES DEL DASHBOARD
+========================================= */
+.section-title {
+    color: #2a1a3a; /* Morado oscuro de tu marca */
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+/* =========================================
+   TARJETAS DE ESTADÍSTICAS (KPIs - StatCard)
+========================================= */
 .admin-stat-card {
     height: 100%;
     padding: 22px;
     border: 1px solid #f0f0f0;
     border-radius: 16px;
     background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03); /* Sombra muy sutil */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Pequeño efecto al pasar el mouse por las estadísticas */
+.admin-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.06);
 }
 
 .admin-stat-label {
-    color: var(--texto-gris);
+    color: #6c757d; /* Gris moderno */
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
 }
 
 .admin-stat-num {
-    color: var(--verde-brand);
-    font-family: 'Poppins', sans-serif;
-    font-size: 2rem;
+    color: #2a1a3a; /* Morado corporativo */
+    font-family: 'Poppins', sans-serif; /* Mantengo tu fuente personalizada */
+    font-size: 2.2rem;
     font-weight: 800;
+    margin: 0;
 }
 
 /* =========================================
-   TARJETAS GENÉRICAS Y ACTIVIDAD RECIENTE
-   ========================================= */
+   TARJETAS CONTENEDORAS (Accesos y Actividad)
+========================================= */
 .admin-card {
     padding: 24px;
     border: 1px solid #f0f0f0;
     border-radius: 16px;
     background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
 }
 
 .admin-card h5 {
     margin-bottom: 18px;
-    color: var(--verde-brand);
+    color: #2a1a3a; /* Títulos en morado */
     font-weight: 700;
+    font-size: 1.2rem;
 }
 
-/* --- Lista de Actividad --- */
+/* =========================================
+   BOTONES DE ACCESOS RÁPIDOS
+========================================= */
+/* Botón Principal (Naranja) */
+.btn-shopnow {
+    background-color: #f17a28; /* Naranja corporativo */
+    color: #ffffff !important; /* !important evita el azul por defecto de los Links */
+    border: none;
+    font-weight: 600;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none; /* Quita el subrayado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* Separación entre el emoji y el texto */
+}
+
+.btn-shopnow:hover {
+    background-color: #d9681f; /* Naranja más oscuro al pasar el mouse */
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(241, 122, 40, 0.3);
+}
+
+/* Botones Secundarios (Borde Morado) */
+.btn-secundario {
+    background-color: transparent;
+    color: #2a1a3a !important; 
+    border: 2px solid #2a1a3a;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-secundario:hover {
+    background-color: #2a1a3a;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 26, 58, 0.2);
+}
+
+/* =========================================
+   LISTA DE ACTIVIDAD RECIENTE
+========================================= */
 .admin-activity-item {
     display: flex;
     justify-content: space-between;
-    padding: 10px 0;
+    align-items: center;
+    padding: 12px 0;
     border-bottom: 1px solid #f0f0f0;
-    color: #1b2a17;
+    color: #333333;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
 
 .admin-activity-item:last-child {
-    border-bottom: none;
+    border-bottom: none; /* El último elemento no tiene línea abajo */
 }
 
 .admin-activity-item .admin-fecha {
-    color: var(--texto-gris);
+    color: #888888;
     font-size: 0.85rem;
+    white-space: nowrap; /* Evita que fechas como "Hace 2 días" se rompan en dos líneas */
+    margin-left: 15px;
+}
+
+/* =========================================
+   BARRA LATERAL Y LAYOUT (AdminLayout)
+========================================= */
+.admin-layout-bg {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.sidebar-admin {
+    background-color: #2a1a3a; /* Tu morado oscuro */
+    min-width: 240px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.titulo-sidebar {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* =========================================
+   ESTILOS DE LOS ENLACES DE LA BARRA LATERAL
+   ========================================= */
+.nav-link-admin {
+    color: #d1c4e9 !important;          /* Lila claro muy legible sobre el morado */
+    text-decoration: none !important;   /* Elimina el subrayado feo */
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    display: block;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse por encima */
+.nav-link-admin:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    transform: translateX(4px); /* Pequeño desplazamiento elegante a la derecha */
+}
+
+/* Efecto MÁGICO: Cuando estás exactamente en esa página (Ruta activa) */
+.nav-link-admin.active {
+    background-color: #f17a28 !important; /* Tu naranja corporativo */
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(241, 122, 40, 0.3);
 }

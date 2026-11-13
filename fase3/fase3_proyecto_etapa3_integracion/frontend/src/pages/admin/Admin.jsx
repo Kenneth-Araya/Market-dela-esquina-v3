@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import '../../styles/estilosAdmin.css';
+import '../../styles/estilosHomeAdmin.css';
 import { Link } from 'react-router-dom';
 import StatCard from './StatCard';
 import { pesos } from '../../utils/storage';
