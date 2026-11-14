@@ -32,7 +32,7 @@ public class JwtUtil {
                 .claim("tipoUsuario", usuario.getTipoUsuario().name())
                 .issuedAt(ahora)
                 .expiration(new Date(ahora.getTime() + expiracionMs))
-                .signWith(clave)
+                .signWith(clave, Jwts.SIG.HS256)
                 .compact();
     }
 }

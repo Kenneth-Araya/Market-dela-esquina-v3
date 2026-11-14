@@ -40,18 +40,30 @@ public class UsuarioService {
 
     @Transactional
     public Usuario registrar(Usuario usuario) {
+
+        // SEGURIDAD: Los registros públicos siempre serán CLIENTES.
+        // Nadie puede registrarse como ADMINISTRADOR desde la tienda.
+        usuario.setTipoUsuario(TipoUsuario.CLIENTE);
+
         normalizar(usuario);
         validar(usuario, true);
+
         if (usuarioRepository.existsByRunUsuario(usuario.getRunUsuario())) {
             throw new IllegalStateException("Ya existe un usuario con ese RUN.");
         }
+
         if (usuarioRepository.existsByCorreoUsuario(usuario.getCorreoUsuario())) {
             throw new IllegalStateException("Ya existe un usuario con ese correo.");
         }
+
         usuario.setId(null);
         usuario.setEstadoUsuario(EstadoUsuario.ACTIVO);
         usuario.setFechaRegistroUsuario(LocalDateTime.now());
-        usuario.setContrasenaUsuario(passwordEncoder.encode(usuario.getContrasenaUsuario()));
+
+        // Ciframos la contraseña antes de guardarla.
+        usuario.setContrasenaUsuario(
+                passwordEncoder.encode(usuario.getContrasenaUsuario()));
+
         return usuarioRepository.save(usuario);
     }
 
@@ -105,16 +117,24 @@ public class UsuarioService {
                 usuarioRepository.countByTipoUsuario(TipoUsuario.VENDEDOR));
     }
 
-    // ---------------- validaciones (las mismas reglas del frontend) ----------------
+    // ---------------- validaciones (las mismas reglas del frontend)
+    // ----------------
 
     private void normalizar(Usuario u) {
-        if (u.getRunUsuario() != null) u.setRunUsuario(u.getRunUsuario().trim().toUpperCase());
-        if (u.getNombreUsuario() != null) u.setNombreUsuario(u.getNombreUsuario().trim());
-        if (u.getApellidosUsuario() != null) u.setApellidosUsuario(u.getApellidosUsuario().trim());
-        if (u.getCorreoUsuario() != null) u.setCorreoUsuario(u.getCorreoUsuario().trim().toLowerCase());
-        if (u.getRegionUsuario() != null) u.setRegionUsuario(u.getRegionUsuario().trim());
-        if (u.getComunaUsuario() != null) u.setComunaUsuario(u.getComunaUsuario().trim());
-        if (u.getDireccionUsuario() != null) u.setDireccionUsuario(u.getDireccionUsuario().trim());
+        if (u.getRunUsuario() != null)
+            u.setRunUsuario(u.getRunUsuario().trim().toUpperCase());
+        if (u.getNombreUsuario() != null)
+            u.setNombreUsuario(u.getNombreUsuario().trim());
+        if (u.getApellidosUsuario() != null)
+            u.setApellidosUsuario(u.getApellidosUsuario().trim());
+        if (u.getCorreoUsuario() != null)
+            u.setCorreoUsuario(u.getCorreoUsuario().trim().toLowerCase());
+        if (u.getRegionUsuario() != null)
+            u.setRegionUsuario(u.getRegionUsuario().trim());
+        if (u.getComunaUsuario() != null)
+            u.setComunaUsuario(u.getComunaUsuario().trim());
+        if (u.getDireccionUsuario() != null)
+            u.setDireccionUsuario(u.getDireccionUsuario().trim());
     }
 
     private void validar(Usuario u, boolean exigirContrasena) {
@@ -162,11 +182,14 @@ public class UsuarioService {
 
     // RUN chileno (módulo 11)
     private boolean esRunValido(String run) {
-        if (run == null || run.contains(".") || run.contains("-")) return false;
-        if (run.length() < 7 || run.length() > 9) return false;
+        if (run == null || run.contains(".") || run.contains("-"))
+            return false;
+        if (run.length() < 7 || run.length() > 9)
+            return false;
         String cuerpo = run.substring(0, run.length() - 1);
         char dvIngresado = Character.toUpperCase(run.charAt(run.length() - 1));
-        if (!cuerpo.matches("\\d+")) return false;
+        if (!cuerpo.matches("\\d+"))
+            return false;
         return calcularDigitoVerificador(cuerpo) == dvIngresado;
     }
 
@@ -178,8 +201,10 @@ public class UsuarioService {
             multiplicador = multiplicador == 7 ? 2 : multiplicador + 1;
         }
         int resto = 11 - (suma % 11);
-        if (resto == 11) return '0';
-        if (resto == 10) return 'K';
+        if (resto == 11)
+            return '0';
+        if (resto == 10)
+            return 'K';
         return (char) ('0' + resto);
     }
 }

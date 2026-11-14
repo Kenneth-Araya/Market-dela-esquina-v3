@@ -10,9 +10,22 @@ function UsuariosAdmin() {
   useEffect(() => {
     const cargarUsuarios = async () => {
       try {
-        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`)
+        // Recuperamos el token JWT guardado al iniciar sesión
+        const token = localStorage.getItem('token')
+
+        // Consultamos los usuarios enviando el token al backend
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+
         if (respuesta.ok) {
           setUsuarios(await respuesta.json())
+        } else if (respuesta.status === 401) {
+          console.error('Tu sesión no es válida o ha expirado')
+        } else if (respuesta.status === 403) {
+          console.error('No tienes permisos para consultar usuarios')
         } else {
           console.error('Error al obtener los usuarios del servidor')
         }
