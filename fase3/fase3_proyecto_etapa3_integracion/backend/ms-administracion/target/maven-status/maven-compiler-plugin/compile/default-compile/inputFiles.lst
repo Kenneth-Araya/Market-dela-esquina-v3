@@ -1,6 +1,7 @@
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\AdministracionApplication.java
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\client\ServiciosClient.java
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\config\RestTemplateConfig.java
+D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\config\SeguridadConfig.java
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\controller\ConfiguracionController.java
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\controller\ContactoController.java
 D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\backend\ms-administracion\src\main\java\cl\duoc\sistemaMarket\controller\ReporteController.java

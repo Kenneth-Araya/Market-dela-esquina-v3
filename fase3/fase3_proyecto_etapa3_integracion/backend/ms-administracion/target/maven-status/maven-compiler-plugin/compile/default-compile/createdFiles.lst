@@ -7,6 +7,7 @@ cl\duoc\sistemaMarket\dto\EstadisticasUsuarioDTO.class
 cl\duoc\sistemaMarket\model\MensajeContacto.class
 cl\duoc\sistemaMarket\controller\ReporteController.class
 cl\duoc\sistemaMarket\model\EstadoContacto.class
+cl\duoc\sistemaMarket\config\SeguridadConfig.class
 cl\duoc\sistemaMarket\dto\VentaPorProductoDTO.class
 cl\duoc\sistemaMarket\model\ConfiguracionTienda.class
 cl\duoc\sistemaMarket\service\ReporteService.class
