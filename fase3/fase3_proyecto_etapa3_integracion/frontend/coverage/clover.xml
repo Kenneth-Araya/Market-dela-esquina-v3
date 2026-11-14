@@ -1,10 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1794603151594" clover="3.2.0">
-  <project timestamp="1794603151594" name="All files">
-    <metrics statements="288" coveredstatements="256" conditionals="162" coveredconditionals="129" methods="67" coveredmethods="65" elements="517" coveredelements="450" complexity="0" loc="288" ncloc="288" packages="2" files="7" classes="7"/>
+<coverage generated="1794654539668" clover="3.2.0">
+  <project timestamp="1794654539668" name="All files">
+    <metrics statements="358" coveredstatements="320" conditionals="190" coveredconditionals="155" methods="92" coveredmethods="88" elements="640" coveredelements="563" complexity="0" loc="358" ncloc="358" packages="4" files="16" classes="16"/>
+    <package name="pages.admin">
+      <metrics statements="62" coveredstatements="62" conditionals="26" coveredconditionals="26" methods="22" coveredmethods="22"/>
+      <file name="ProductosAdmin.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\admin\ProductosAdmin.jsx">
+        <metrics statements="22" coveredstatements="22" conditionals="8" coveredconditionals="8" methods="8" coveredmethods="8"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="9" count="6" type="stmt"/>
+        <line num="11" count="6" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="15" count="3" type="stmt"/>
+        <line num="17" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="18" count="2" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="22" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="25" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="32" count="4" type="stmt"/>
+        <line num="36" count="6" type="stmt"/>
+        <line num="37" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="41" count="6" type="stmt"/>
+        <line num="42" count="6" type="stmt"/>
+        <line num="44" count="6" type="stmt"/>
+        <line num="69" count="3" type="stmt"/>
+      </file>
+      <file name="StatCard.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\admin\StatCard.jsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="5" count="66" type="stmt"/>
+      </file>
+      <file name="UsuariosAdmin.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\admin\UsuariosAdmin.jsx">
+        <metrics statements="18" coveredstatements="18" conditionals="10" coveredconditionals="10" methods="6" coveredmethods="6"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="10" count="6" type="stmt"/>
+        <line num="11" count="5" type="stmt"/>
+        <line num="12" count="5" type="stmt"/>
+        <line num="14" count="5" type="stmt"/>
+        <line num="17" count="5" type="stmt"/>
+        <line num="23" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="27" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="37" count="5" type="stmt"/>
+        <line num="41" count="18" type="stmt"/>
+        <line num="43" count="6" type="stmt"/>
+        <line num="73" count="3" type="stmt"/>
+      </file>
+      <file name="VentasAdmin.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\admin\VentasAdmin.jsx">
+        <metrics statements="21" coveredstatements="21" conditionals="8" coveredconditionals="8" methods="7" coveredmethods="7"/>
+        <line num="6" count="3" type="stmt"/>
+        <line num="11" count="6" type="stmt"/>
+        <line num="12" count="6" type="stmt"/>
+        <line num="19" count="6" type="stmt"/>
+        <line num="20" count="4" type="stmt"/>
+        <line num="21" count="4" type="stmt"/>
+        <line num="22" count="4" type="stmt"/>
+        <line num="23" count="3" type="stmt"/>
+        <line num="25" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="30" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="33" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="40" count="4" type="stmt"/>
+        <line num="43" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="6" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
+        <line num="71" count="2" type="stmt"/>
+        <line num="74" count="3" type="stmt"/>
+      </file>
+    </package>
     <package name="pages.client">
       <metrics statements="288" coveredstatements="256" conditionals="162" coveredconditionals="129" methods="67" coveredmethods="65"/>
-      <file name="Carrito.jsx" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Carrito.jsx">
+      <file name="Carrito.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Carrito.jsx">
         <metrics statements="72" coveredstatements="67" conditionals="26" coveredconditionals="23" methods="23" coveredmethods="23"/>
         <line num="7" count="20" type="stmt"/>
         <line num="8" count="10" type="stmt"/>
@@ -79,7 +156,7 @@
         <line num="183" count="2" type="stmt"/>
         <line num="191" count="1" type="stmt"/>
       </file>
-      <file name="Login.jsx" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Login.jsx">
+      <file name="Login.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Login.jsx">
         <metrics statements="55" coveredstatements="55" conditionals="28" coveredconditionals="28" methods="6" coveredmethods="6"/>
         <line num="6" count="702" type="stmt"/>
         <line num="7" count="702" type="stmt"/>
@@ -137,7 +214,7 @@
         <line num="153" count="145" type="stmt"/>
         <line num="154" count="145" type="cond" truecount="2" falsecount="0"/>
       </file>
-      <file name="Productos.jsx" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Productos.jsx">
+      <file name="Productos.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Productos.jsx">
         <metrics statements="38" coveredstatements="38" conditionals="14" coveredconditionals="12" methods="18" coveredmethods="18"/>
         <line num="6" count="48" type="stmt"/>
         <line num="9" count="48" type="stmt"/>
@@ -178,7 +255,7 @@
         <line num="124" count="2" type="stmt"/>
         <line num="135" count="12" type="stmt"/>
       </file>
-      <file name="Registro.jsx" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Registro.jsx">
+      <file name="Registro.jsx" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\pages\client\Registro.jsx">
         <metrics statements="123" coveredstatements="96" conditionals="94" coveredconditionals="66" methods="20" coveredmethods="18"/>
         <line num="6" count="1" type="stmt"/>
         <line num="13" count="0" type="stmt"/>
@@ -307,14 +384,40 @@
     </package>
     <package name="styles">
       <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="estilosCarrito.css" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosCarrito.css">
+      <file name="estilosCarrito.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosCarrito.css">
         <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       </file>
-      <file name="estilosLogin.css" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosLogin.css">
+      <file name="estilosLogin.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosLogin.css">
         <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       </file>
-      <file name="estilosProductos.css" path="C:\Users\Bairon Valencia\react-market-dela-esquina\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosProductos.css">
+      <file name="estilosProductos.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosProductos.css">
         <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="estilosProductosAdmin.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosProductosAdmin.css">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="estilosStatCard.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosStatCard.css">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="estilosUsuariosAdmin.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosUsuariosAdmin.css">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="estilosVentasAdmin.css" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\styles\estilosVentasAdmin.css">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+    </package>
+    <package name="utils">
+      <metrics statements="8" coveredstatements="2" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="1"/>
+      <file name="storage.js" path="D:\descargas\Market-dela-esquina-v3\fase3\fase3_proyecto_etapa3_integracion\frontend\src\utils\storage.js">
+        <metrics statements="8" coveredstatements="2" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="1"/>
+        <line num="3" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="19" count="26" type="stmt"/>
+        <line num="20" count="2" type="stmt"/>
       </file>
     </package>
   </project>
