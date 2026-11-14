@@ -51,10 +51,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=http://ms-usuario:8081
-      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=http://ms-catalogo:8082
-      - SPRING_CLOUD_GATEWAY_ROUTES_2_URI=http://ms-ventas:8083
-      - SPRING_CLOUD_GATEWAY_ROUTES_3_URI=http://ms-administracion:8084
+      - USUARIO_URL=http://ms-usuario:8081
+      - CATALOGO_URL=http://ms-catalogo:8082
+      - VENTAS_URL=http://ms-ventas:8083
+      - ADMINISTRACION_URL=http://ms-administracion:8084
     depends_on:
       - ms-usuario
       - ms-catalogo

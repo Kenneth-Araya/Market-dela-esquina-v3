@@ -1,5 +1,3 @@
-# 1. Actualizar pom.xml con JaCoCo 0.8.12
-$pom = @'
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -11,9 +9,9 @@ $pom = @'
         <relativePath/>
     </parent>
     <groupId>cl.duoc</groupId>
-    <artifactId>ms-ventas</artifactId>
+    <artifactId>ms-administracion</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>ms-ventas</name>
+    <name>ms-administracion</name>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -25,6 +23,14 @@ $pom = @'
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -54,6 +60,11 @@ $pom = @'
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -77,7 +88,7 @@ $pom = @'
                     <excludes>
                         <exclude>**/dto/**</exclude>
                         <exclude>**/model/**</exclude>
-                        <exclude>**/VentasApplication*</exclude>
+                        <exclude>**/AdministracionApplication*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

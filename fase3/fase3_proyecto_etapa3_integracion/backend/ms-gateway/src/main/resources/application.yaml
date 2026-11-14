@@ -6,45 +6,41 @@ spring:
     name: ms-gateway
   cloud:
     gateway:
-      routes:
-        # 1. Microservicio de Usuarios
-        - id: ms-usuario
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/usuarios/**, /api/auth/**, /api/regiones/**
+      server:
+        webflux:
+          routes:
+            - id: ms-usuario
+              uri: ${USUARIO_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/usuarios/**, /api/auth/**, /api/regiones/**
 
-        # 2. Microservicio de Catálogo
-        - id: ms-catalogo
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/productos/**, /api/categorias/**, /api/inventario/**
+            - id: ms-catalogo
+              uri: ${CATALOGO_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/productos/**, /api/categorias/**, /api/inventario/**
 
-        # 3. Microservicio de Ventas
-        - id: ms-ventas
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/ventas/**, /api/carrito/**, /api/boletas/**
+            - id: ms-ventas
+              uri: ${VENTAS_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/ventas/**, /api/carrito/**, /api/boletas/**
 
-        # 4. Microservicio de Administración
-        - id: ms-administracion
-          uri: http://localhost:8084
-          predicates:
-            - Path=/api/configuracion/**, /api/contactos/**, /api/reportes/**
+            - id: ms-administracion
+              uri: ${ADMINISTRACION_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/configuracion/**, /api/contactos/**, /api/reportes/**
 
-      # Evitar encabezados CORS duplicados
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials RETAIN_UNIQUE
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials RETAIN_UNIQUE
 
-      # Permitir que React se comunique con el Gateway
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "http://localhost:5173"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
