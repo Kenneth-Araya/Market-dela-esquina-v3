@@ -23,7 +23,16 @@ function Admin() {
   useEffect(() => {
     const cargarDashboard = async () => {
       try {
-        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/reportes/dashboard`);
+        // Obtenemos el token JWT del administrador
+        const token = localStorage.getItem('token');
+
+        // Consultamos el dashboard enviando el token
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/reportes/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
         if (respuesta.ok) {
           setDashboard(await respuesta.json());
         } else {
@@ -40,9 +49,24 @@ function Admin() {
   useEffect(() => {
     const cargarActividad = async () => {
       try {
-        const respuestaUsuarios = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`);
+        // Obtenemos el token JWT del administrador
+        const token = localStorage.getItem('token');
+
+        // Consultamos los usuarios enviando el token JWT
+        const respuestaUsuarios = await fetch(`${import.meta.env.VITE_API_URL}/usuarios`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
         const respuestaVentas = await fetch(`${import.meta.env.VITE_API_URL}/ventas`);
-        const respuestaContactos = await fetch(`${import.meta.env.VITE_API_URL}/contactos`);
+        
+        // Consultamos los contactos enviando el token JWT del administrador
+        const respuestaContactos = await fetch(`${import.meta.env.VITE_API_URL}/contactos`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
 
         const eventos = [];
 
@@ -96,6 +120,7 @@ function Admin() {
         // Dejamos los 5 eventos más recientes
         eventos.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
         setActividad(eventos.slice(0, 5));
+
       } catch (error) {
         console.error('Error conectando con el backend:', error);
       }

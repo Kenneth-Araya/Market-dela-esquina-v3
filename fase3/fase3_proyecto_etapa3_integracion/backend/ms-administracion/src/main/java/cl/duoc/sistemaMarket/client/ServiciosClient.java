@@ -1,5 +1,9 @@
 package cl.duoc.sistemaMarket.client;
-
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +14,10 @@ import cl.duoc.sistemaMarket.dto.EstadisticasVentasDTO;
 import cl.duoc.sistemaMarket.dto.VentaPorProductoDTO;
 import lombok.RequiredArgsConstructor;
 
-/** Consulta a los otros microservicios. Los reportes no guardan copias de sus datos. */
+/**
+ * Consulta a los otros microservicios. Los reportes no guardan copias de sus
+ * datos.
+ */
 @Component
 @RequiredArgsConstructor
 public class ServiciosClient {
@@ -27,7 +34,27 @@ public class ServiciosClient {
     private String ventasUrl;
 
     public EstadisticasUsuarioDTO estadisticasUsuarios() {
-        return restTemplate.getForObject(usuarioUrl + "/api/usuarios/estadisticas", EstadisticasUsuarioDTO.class);
+
+        // Obtener el token JWT recibido desde React
+        ServletRequestAttributes atributos = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+
+        String token = atributos.getRequest().getHeader("Authorization");
+
+        // Crear los encabezados de la solicitud
+        HttpHeaders headers = new HttpHeaders();
+
+        if (token != null) {
+            headers.set("Authorization", token);
+        }
+
+        // Enviar el JWT al microservicio de usuarios
+        HttpEntity<Void> peticion = new HttpEntity<>(headers);
+
+        return restTemplate.exchange(
+                usuarioUrl + "/api/usuarios/estadisticas",
+                HttpMethod.GET,
+                peticion,
+                EstadisticasUsuarioDTO.class).getBody();
     }
 
     public long totalProductos() {
