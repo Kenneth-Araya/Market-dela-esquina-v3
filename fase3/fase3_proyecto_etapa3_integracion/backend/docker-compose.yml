@@ -3,7 +3,7 @@ services:
     build: ./ms-usuario
     container_name: ms-usuario
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     networks:
       - market-net
 
@@ -11,7 +11,7 @@ services:
     build: ./ms-catalogo
     container_name: ms-catalogo
     ports:
-      - "8082:8082"
+      - "127.0.0.1:8082:8082"
     networks:
       - market-net
 
@@ -19,7 +19,7 @@ services:
     build: ./ms-ventas
     container_name: ms-ventas
     ports:
-      - "8083:8083"
+      - "127.0.0.1:8083:8083"
     environment:
       - USUARIO_URL=http://ms-usuario:8081
       - CATALOGO_URL=http://ms-catalogo:8082
@@ -33,7 +33,7 @@ services:
     build: ./ms-administracion
     container_name: ms-administracion
     ports:
-      - "8084:8084"
+      - "127.0.0.1:8084:8084"
     environment:
       - USUARIO_URL=http://ms-usuario:8081
       - CATALOGO_URL=http://ms-catalogo:8082
@@ -50,7 +50,7 @@ services:
     build: ./ms-gateway
     container_name: ms-gateway
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       - USUARIO_URL=http://ms-usuario:8081
       - CATALOGO_URL=http://ms-catalogo:8082
@@ -69,7 +69,7 @@ services:
     build: ../frontend
     container_name: market-frontend
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       - ms-gateway
     networks:
