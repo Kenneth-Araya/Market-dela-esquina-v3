@@ -38,6 +38,7 @@ services:
       - USUARIO_URL=http://ms-usuario:8081
       - CATALOGO_URL=http://ms-catalogo:8082
       - VENTAS_URL=http://ms-ventas:8083
+      - JWT_SECRET=${JWT_SECRET}
     depends_on:
       - ms-usuario
       - ms-catalogo
@@ -60,6 +61,17 @@ services:
       - ms-catalogo
       - ms-ventas
       - ms-administracion
+    networks:
+      - market-net
+
+
+  frontend:
+    build: ../frontend
+    container_name: market-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - ms-gateway
     networks:
       - market-net
 
