@@ -1,0 +1,68 @@
+services:
+  ms-usuario:
+    build: ./ms-usuario
+    container_name: ms-usuario
+    ports:
+      - "8081:8081"
+    networks:
+      - market-net
+
+  ms-catalogo:
+    build: ./ms-catalogo
+    container_name: ms-catalogo
+    ports:
+      - "8082:8082"
+    networks:
+      - market-net
+
+  ms-ventas:
+    build: ./ms-ventas
+    container_name: ms-ventas
+    ports:
+      - "8083:8083"
+    environment:
+      - USUARIO_URL=http://ms-usuario:8081
+      - CATALOGO_URL=http://ms-catalogo:8082
+    depends_on:
+      - ms-usuario
+      - ms-catalogo
+    networks:
+      - market-net
+
+  ms-administracion:
+    build: ./ms-administracion
+    container_name: ms-administracion
+    ports:
+      - "8084:8084"
+    environment:
+      - USUARIO_URL=http://ms-usuario:8081
+      - CATALOGO_URL=http://ms-catalogo:8082
+      - VENTAS_URL=http://ms-ventas:8083
+    depends_on:
+      - ms-usuario
+      - ms-catalogo
+      - ms-ventas
+    networks:
+      - market-net
+
+  ms-gateway:
+    build: ./ms-gateway
+    container_name: ms-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_CLOUD_GATEWAY_ROUTES_0_URI=http://ms-usuario:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES_1_URI=http://ms-catalogo:8082
+      - SPRING_CLOUD_GATEWAY_ROUTES_2_URI=http://ms-ventas:8083
+      - SPRING_CLOUD_GATEWAY_ROUTES_3_URI=http://ms-administracion:8084
+    depends_on:
+      - ms-usuario
+      - ms-catalogo
+      - ms-ventas
+      - ms-administracion
+    networks:
+      - market-net
+
+networks:
+  market-net:
+    driver: bridge
